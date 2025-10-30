@@ -1,5 +1,6 @@
 package com.example.clinica.services;
 
+import com.example.clinica.models.Consulta;
 import com.example.clinica.models.Paciente;
 import com.example.clinica.repositories.PacienteRepository;
 import com.example.clinica.repositories.ConsultaRepository;
@@ -52,14 +53,21 @@ public class PacienteService {
         return pacienteRepository.save(paciente);
     }
 
-    public void excluirPaciente(Integer id) {
-        Paciente paciente = buscarPacientePorId(id);
+    public String excluirPaciente(Integer id) {
+        Paciente paciente = pacienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado."));
 
-        // Checa se existem consultas associadas
-        if (!consultaRepository.findByPacienteId(id).isEmpty()) {
-            throw new RuntimeException("Não é possível excluir paciente com consultas associadas.");
+        List<Consulta> consultas = consultaRepository.findByPacienteId(id);
+        if (!consultas.isEmpty()) {
+            throw new RuntimeException("Paciente possui consultas associadas e não pode ser excluído.");
         }
 
         pacienteRepository.delete(paciente);
+        return "Paciente excluído com sucesso.";
     }
+
+    public Integer calcularIdadePaciente(Integer idPaciente) {
+        return pacienteRepository.calcularIdade(idPaciente);
+    }
+
 }
