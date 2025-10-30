@@ -4,6 +4,14 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+@NamedStoredProcedureQuery(name = "Consulta.criar_consulta", procedureName = "criar_consulta", parameters = {
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_id_paciente", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_id_medico", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_data_consulta", type = java.time.LocalDate.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_hora_inicio", type = java.time.LocalTime.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_hora_fim", type = java.time.LocalTime.class)
+})
+
 @Entity
 @Table(name = "consultas")
 public class Consulta {
@@ -26,7 +34,7 @@ public class Consulta {
     private LocalTime hora_fim;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum('AGENDADA','REALIZADA','CANCELADA')", nullable = false)
+    @Column(columnDefinition = "enum('AGENDADA','REALIZADA','CANCELADA')")
     private ConsultaStatus status = ConsultaStatus.AGENDADA;
 
     public Integer getId_consulta() {
