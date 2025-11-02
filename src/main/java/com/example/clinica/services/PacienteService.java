@@ -1,13 +1,19 @@
 package com.example.clinica.services;
 
+import com.example.clinica.dto.ConsultaDTO;
+import com.example.clinica.dto.HistoricoPacienteDTO;
 import com.example.clinica.models.Consulta;
 import com.example.clinica.models.Paciente;
 import com.example.clinica.repositories.PacienteRepository;
 import com.example.clinica.repositories.ConsultaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PacienteService {
@@ -69,4 +75,23 @@ public class PacienteService {
         return pacienteRepository.calcularIdade(idPaciente);
     }
 
+    @Transactional
+    public List<HistoricoPacienteDTO> listarHistoricoPaciente(Integer idPaciente) {
+        List<Map<String, Object>> historico = pacienteRepository.listarHistoricoPaciente(idPaciente);
+
+        return historico.stream().map(h -> {
+            HistoricoPacienteDTO dto = new HistoricoPacienteDTO();
+            dto.setIdConsulta((Integer) h.get("idConsulta"));
+            dto.setDataConsulta(((java.sql.Date) h.get("dataConsulta")).toLocalDate());
+            dto.setHoraInicio(((java.sql.Time) h.get("horaInicio")).toLocalTime());
+            dto.setHoraFim(((java.sql.Time) h.get("horaFim")).toLocalTime());
+            dto.setStatusConsulta((String) h.get("status"));
+            dto.setIdProntuario((Integer) h.get("idProntuario"));
+            dto.setAnamnese((String) h.get("anamnese"));
+            dto.setDiagnostico((String) h.get("diagnostico"));
+            dto.setPrescricao((String) h.get("prescricao"));
+            dto.setNomeMedico((String) h.get("nomeMedico"));
+            return dto;
+        }).collect(Collectors.toList());
+    }
 }

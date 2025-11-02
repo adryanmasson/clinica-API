@@ -3,6 +3,8 @@ package com.example.clinica.dto;
 import java.time.LocalDate;
 import java.util.Map;
 
+import com.example.clinica.models.Prontuario;
+
 public class ProntuarioDTO {
 
         private Integer idProntuario;
@@ -122,5 +124,24 @@ public class ProntuarioDTO {
                 return new ProntuarioDTO(idProntuario, idConsulta, nomePaciente, nomeMedico, anamnese, diagnostico,
                                 prescricao,
                                 dataRegistro);
+        }
+
+        public static ProntuarioDTO fromEntity(Prontuario prontuario) {
+                if (prontuario == null)
+                        return null;
+
+                return new ProntuarioDTO(
+                                prontuario.getIdProntuario(),
+                                prontuario.getConsulta() != null ? prontuario.getConsulta().getId_consulta() : null,
+                                prontuario.getConsulta() != null && prontuario.getConsulta().getPaciente() != null
+                                                ? prontuario.getConsulta().getPaciente().getNome()
+                                                : null,
+                                prontuario.getConsulta() != null && prontuario.getConsulta().getMedico() != null
+                                                ? prontuario.getConsulta().getMedico().getNome()
+                                                : null,
+                                prontuario.getAnamnese(),
+                                prontuario.getDiagnostico(),
+                                prontuario.getPrescricao(),
+                                prontuario.getDataRegistro());
         }
 }

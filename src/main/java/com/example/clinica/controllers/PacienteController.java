@@ -1,6 +1,8 @@
 package com.example.clinica.controllers;
 
 import com.example.clinica.dto.ApiResponse;
+import com.example.clinica.dto.ConsultaDTO;
+import com.example.clinica.dto.HistoricoPacienteDTO;
 import com.example.clinica.models.Paciente;
 import com.example.clinica.services.PacienteService;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,11 @@ public class PacienteController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Paciente>>> listarPacientes() {
         List<Paciente> pacientes = pacienteService.listarPacientes();
-        ApiResponse<List<Paciente>> body = ApiResponse.sucesso("Pacientes listados com sucesso.", pacientes);
+        String mensagem = pacientes.isEmpty()
+                ? "Nenhum paciente encontrado."
+                : "Pacientes listados com sucesso.";
+        ApiResponse<List<Paciente>> body = ApiResponse.sucesso(mensagem, pacientes);
+
         return ResponseEntity.ok(body);
     }
 
@@ -60,6 +66,19 @@ public class PacienteController {
         Integer idade = pacienteService.calcularIdadePaciente(id);
         ApiResponse<Integer> body = ApiResponse.sucesso("Idade calculada com sucesso.", idade);
         return ResponseEntity.ok(body);
+    }
+
+    @GetMapping("/{id}/historico")
+    public ResponseEntity<ApiResponse<List<HistoricoPacienteDTO>>> listarHistoricoPaciente(
+            @PathVariable Integer id) {
+
+        List<HistoricoPacienteDTO> historico = pacienteService.listarHistoricoPaciente(id);
+
+        String mensagem = historico.isEmpty()
+                ? "Nenhum histórico encontrado para este paciente."
+                : "Histórico do paciente retornado com sucesso.";
+
+        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, historico));
     }
 
 }

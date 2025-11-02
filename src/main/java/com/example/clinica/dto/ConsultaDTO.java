@@ -3,6 +3,8 @@ package com.example.clinica.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.example.clinica.models.Consulta;
+
 public class ConsultaDTO {
     private Integer id;
     private String nomePaciente;
@@ -22,6 +24,21 @@ public class ConsultaDTO {
         this.horaInicio = horaInicio;
         this.horaFim = horaFim;
         this.status = status;
+    }
+
+    public ConsultaDTO() {
+    }
+
+    public static ConsultaDTO fromEntity(Consulta consulta) {
+        ConsultaDTO dto = new ConsultaDTO();
+        dto.setId(consulta.getId_consulta());
+        dto.setNomePaciente(consulta.getPaciente().getNome());
+        dto.setNomeMedico(consulta.getMedico().getNome());
+        dto.setDataConsulta(consulta.getData_consulta());
+        dto.setHoraInicio(consulta.getHora_inicio());
+        dto.setHoraFim(consulta.getHora_fim());
+        dto.setStatus(consulta.getStatus().name());
+        return dto;
     }
 
     public Integer getId() {

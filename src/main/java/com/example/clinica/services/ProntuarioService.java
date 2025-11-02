@@ -3,12 +3,14 @@ package com.example.clinica.services;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.clinica.dto.ProntuarioDTO;
+import com.example.clinica.dto.AtualizarProntuarioDTO;
 import com.example.clinica.dto.CriarProntuarioDTO;
 import com.example.clinica.models.Prontuario;
 import com.example.clinica.models.Consulta;
@@ -65,4 +67,36 @@ public class ProntuarioService {
         Map<String, Object> detalhado = prontuarioRepository.findDetalhadoByConsultaId(idConsulta);
         return ProntuarioDTO.fromMap(detalhado);
     }
+
+    @Transactional
+    public ProntuarioDTO atualizarProntuario(Integer id, AtualizarProntuarioDTO dados) {
+        Optional<Prontuario> optionalProntuario = prontuarioRepository.findById(id);
+
+        if (optionalProntuario.isEmpty()) {
+            return null;
+        }
+
+        Prontuario prontuario = optionalProntuario.get();
+
+        if (dados.getAnamnese() != null)
+            prontuario.setAnamnese(dados.getAnamnese());
+        if (dados.getDiagnostico() != null)
+            prontuario.setDiagnostico(dados.getDiagnostico());
+        if (dados.getPrescricao() != null)
+            prontuario.setPrescricao(dados.getPrescricao());
+
+        prontuarioRepository.save(prontuario);
+
+        return ProntuarioDTO.fromEntity(prontuario);
+    }
+
+    @Transactional
+    public boolean excluirProntuario(Integer idProntuario) {
+        if (prontuarioRepository.existsById(idProntuario)) {
+            prontuarioRepository.deleteById(idProntuario);
+            return true;
+        }
+        return false;
+    }
+
 }

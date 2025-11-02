@@ -2,6 +2,7 @@ package com.example.clinica.controllers;
 
 import com.example.clinica.dto.ApiResponse;
 import com.example.clinica.models.Especialidade;
+import com.example.clinica.models.Medico;
 import com.example.clinica.services.EspecialidadeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +22,10 @@ public class EspecialidadeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Especialidade>>> listarEspecialidades() {
         List<Especialidade> especialidades = especialidadeService.listarEspecialidades();
-        ApiResponse<List<Especialidade>> body = ApiResponse.sucesso("Especialidades listadas com sucesso.",
-                especialidades);
+        String mensagem = especialidades.isEmpty()
+                ? "Nenhuma especialidade encontrada."
+                : "Especialidades listadas com sucesso.";
+        ApiResponse<List<Especialidade>> body = ApiResponse.sucesso(mensagem, especialidades);
         return ResponseEntity.ok(body);
     }
 

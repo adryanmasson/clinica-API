@@ -32,9 +32,8 @@ public class ConsultaController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ConsultaDTO>>> listarConsultas() {
         List<ConsultaDTO> consultas = consultaService.listarConsultas();
-        ApiResponse<List<ConsultaDTO>> body = ApiResponse.sucesso(
-                consultas.isEmpty() ? "Nenhuma consulta encontrada." : "Consultas listadas com sucesso.",
-                consultas);
+        String mensagem = consultas.isEmpty() ? "Nenhuma consulta encontrada." : "Consultas listadas com sucesso.";
+        ApiResponse<List<ConsultaDTO>> body = ApiResponse.sucesso(mensagem, consultas);
         return ResponseEntity.ok(body);
     }
 

@@ -21,7 +21,10 @@ public class MedicoController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Medico>>> listarMedicos() {
         List<Medico> medicos = medicoService.listarMedicos();
-        ApiResponse<List<Medico>> body = ApiResponse.sucesso("Médicos listados com sucesso.", medicos);
+        String mensagem = medicos.isEmpty()
+                ? "Nenhum medico encontrado."
+                : "Médicos listados com sucesso.";
+        ApiResponse<List<Medico>> body = ApiResponse.sucesso(mensagem, medicos);
         return ResponseEntity.ok(body);
     }
 
