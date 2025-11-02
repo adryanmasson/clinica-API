@@ -9,30 +9,60 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.clinica.dto.ProntuarioDTO;
+import com.example.clinica.dto.CriarProntuarioDTO;
 import com.example.clinica.models.Prontuario;
+import com.example.clinica.models.Consulta;
 import com.example.clinica.repositories.ProntuarioRepository;
+import com.example.clinica.repositories.ConsultaRepository;
 
 @Service
 public class ProntuarioService {
 
     private final ProntuarioRepository prontuarioRepository;
+    private final ConsultaRepository consultaRepository;
 
-    public ProntuarioService(ProntuarioRepository prontuarioRepository) {
+    public ProntuarioService(ProntuarioRepository prontuarioRepository, ConsultaRepository consultaRepository) {
         this.prontuarioRepository = prontuarioRepository;
+        this.consultaRepository = consultaRepository;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<ProntuarioDTO> listarProntuarios() {
         List<Map<String, Object>> prontuarios = prontuarioRepository.listarProntuarios();
-
-        return prontuarios.stream()
-                .map(ProntuarioDTO::fromMap)
-                .collect(Collectors.toList());
+        return prontuarios.stream().map(ProntuarioDTO::fromMap).collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public ProntuarioDTO buscarPorConsulta(Integer idConsulta) {
         Map<String, Object> m = prontuarioRepository.findDetalhadoByConsultaId(idConsulta);
         return ProntuarioDTO.fromMap(m);
+    }
+
+    @Transactional
+    public ProntuarioDTO criarProntuario(CriarProntuarioDTO dto) {
+        Integer idConsulta = dto.getIdConsulta();
+        if (idConsulta == null) {
+            throw new RuntimeException("idConsulta é obrigatório.");
+        }
+
+        Prontuario existente = prontuarioRepository.findByConsultaId(idConsulta);
+        if (existente != null) {
+            throw new RuntimeException("Já existe prontuário para essa consulta.");
+        }
+
+        Consulta consulta = consultaRepository.findById(idConsulta)
+                .orElseThrow(() -> new RuntimeException("Consulta não encontrada."));
+
+        Prontuario prontuario = new Prontuario();
+        prontuario.setConsulta(consulta);
+        prontuario.setAnamnese(dto.getAnamnese());
+        prontuario.setDiagnostico(dto.getDiagnostico());
+        prontuario.setPrescricao(dto.getPrescricao());
+        prontuario.setDataRegistro(LocalDate.now());
+
+        prontuarioRepository.save(prontuario);
+
+        Map<String, Object> detalhado = prontuarioRepository.findDetalhadoByConsultaId(idConsulta);
+        return ProntuarioDTO.fromMap(detalhado);
     }
 }

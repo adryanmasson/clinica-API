@@ -12,18 +12,14 @@ public class Prontuario {
     @Column(name = "id_prontuario")
     private Integer idProntuario;
 
-    // Relacionamento com consulta (lazy)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_id_consulta")
     private Consulta consulta;
 
-    @Column(columnDefinition = "text")
     private String anamnese;
 
-    @Column(columnDefinition = "text")
     private String diagnostico;
 
-    @Column(columnDefinition = "text")
     private String prescricao;
 
     @Column(name = "data_registro")

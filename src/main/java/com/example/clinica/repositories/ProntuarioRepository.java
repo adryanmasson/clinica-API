@@ -1,7 +1,6 @@
 package com.example.clinica.repositories;
 
 import com.example.clinica.models.Prontuario;
-
 import java.util.List;
 import java.util.Map;
 
@@ -41,4 +40,7 @@ public interface ProntuarioRepository extends JpaRepository<Prontuario, Integer>
             "JOIN medicos m ON m.id_medico = c.fk_id_medico " +
             "WHERE p.fk_id_consulta = :idConsulta", nativeQuery = true)
     Map<String, Object> findDetalhadoByConsultaId(@Param("idConsulta") Integer idConsulta);
+
+    @Query("SELECT pr FROM Prontuario pr WHERE pr.consulta.id_consulta = :idConsulta")
+    Prontuario findByConsultaId(@Param("idConsulta") Integer idConsulta);
 }

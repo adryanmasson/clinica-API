@@ -29,7 +29,6 @@ public class ProntuarioDTO {
                 this.dataRegistro = dataRegistro;
         }
 
-        // getters / setters
         public Integer getIdProntuario() {
                 return idProntuario;
         }
@@ -94,18 +93,14 @@ public class ProntuarioDTO {
                 this.dataRegistro = dataRegistro;
         }
 
-        /**
-         * Helper para criar DTO a partir do Map que vem da query nativa.
-         * Trata tipos de data (java.sql.Date / java.sql.Timestamp).
-         */
         public static ProntuarioDTO fromMap(Map<String, Object> m) {
                 if (m == null) {
                         return null;
                 }
 
-                Integer idProntuario = (m.get("idProntuario") != null) ? ((Number) m.get("idProntuario")).intValue()
+                Integer idProntuario = m.get("idProntuario") != null ? ((Number) m.get("idProntuario")).intValue()
                                 : null;
-                Integer idConsulta = (m.get("idConsulta") != null) ? ((Number) m.get("idConsulta")).intValue() : null;
+                Integer idConsulta = m.get("idConsulta") != null ? ((Number) m.get("idConsulta")).intValue() : null;
                 String nomePaciente = (String) m.get("nomePaciente");
                 String nomeMedico = (String) m.get("nomeMedico");
                 String anamnese = (String) m.get("anamnese");
@@ -113,14 +108,14 @@ public class ProntuarioDTO {
                 String prescricao = (String) m.get("prescricao");
 
                 LocalDate dataRegistro = null;
-                Object dateObj = m.get("data_registro");
-                if (dateObj != null) {
-                        if (dateObj instanceof java.sql.Date) {
-                                dataRegistro = ((java.sql.Date) dateObj).toLocalDate();
-                        } else if (dateObj instanceof java.sql.Timestamp) {
-                                dataRegistro = ((java.sql.Timestamp) dateObj).toLocalDateTime().toLocalDate();
-                        } else if (dateObj instanceof java.time.LocalDate) {
-                                dataRegistro = (java.time.LocalDate) dateObj;
+                Object d = m.get("data_registro");
+                if (d != null) {
+                        if (d instanceof java.sql.Date) {
+                                dataRegistro = ((java.sql.Date) d).toLocalDate();
+                        } else if (d instanceof java.sql.Timestamp) {
+                                dataRegistro = ((java.sql.Timestamp) d).toLocalDateTime().toLocalDate();
+                        } else if (d instanceof java.time.LocalDate) {
+                                dataRegistro = (java.time.LocalDate) d;
                         }
                 }
 
