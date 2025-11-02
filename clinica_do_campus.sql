@@ -47,7 +47,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `criar_consulta` (IN `p_id_paciente`
         -- Não pode agendar, gerando conflito, logo, reverte e sinaliza erro.
         ROLLBACK;
         SIGNAL SQLSTATE '45000'
-            SET MESSAGE_TEXT = 'Erro: Médico já possui consulta agendada neste horário.';
+            SET MESSAGE_TEXT = 'Médico já possui consulta agendada neste horário.';
     ELSE
         -- 2) Caso tudo ocorra bem (Sem conflito), uma nova consulta é inserida na tabela.
         INSERT INTO consultas (fk_id_paciente, fk_id_medico, data_consulta, hora_inicio, hora_fim, status)
@@ -131,7 +131,7 @@ INSERT INTO `consultas` (`id_consulta`, `fk_id_paciente`, `fk_id_medico`, `data_
 (10, 1, 2, '2025-10-30', '16:00:00', '17:00:00', 'AGENDADA'),
 (11, 1, 2, '2025-10-15', '09:00:00', '10:00:00', 'AGENDADA'),
 (12, 1, 3, '2025-09-28', '14:00:00', '15:00:00', 'AGENDADA'),
-(13, 1, 2, '2025-08-10', '08:30:00', '09:00:00', ''),
+(13, 1, 2, '2025-08-10', '08:30:00', '09:00:00', 'REALIZADA'),
 (14, 1, 4, '2025-07-05', '15:00:00', '16:00:00', 'AGENDADA'),
 (15, 1, 3, '2025-05-19', '10:30:00', '11:00:00', 'CANCELADA');
 

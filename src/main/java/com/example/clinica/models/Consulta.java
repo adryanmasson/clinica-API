@@ -27,6 +27,10 @@ public class Consulta {
     @Column(name = "fk_id_medico")
     private Integer fkIdMedico;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "fk_id_medico", insertable = false, updatable = false)
+    private Medico medico;
+
     private LocalDate data_consulta;
 
     private LocalTime hora_inicio;
@@ -91,5 +95,30 @@ public class Consulta {
 
     public void setStatus(ConsultaStatus status) {
         this.status = status;
+    }
+
+    public Integer getId() {
+        return this.id_consulta;
+    }
+
+    public void setId(Integer id) {
+        this.id_consulta = id;
+    }
+
+    public Medico getMedico() {
+        return this.medico;
+    }
+
+    public void setMedico(Medico medico) {
+        this.medico = medico;
+        if (medico != null) {
+            try {
+                Integer mid = null;
+                mid = (Integer) medico.getClass().getMethod("getId_medico").invoke(medico);
+                if (mid != null)
+                    this.fkIdMedico = mid;
+            } catch (Exception ignored) {
+            }
+        }
     }
 }
