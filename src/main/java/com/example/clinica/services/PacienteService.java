@@ -8,8 +8,6 @@ import com.example.clinica.repositories.PacienteRepository;
 import com.example.clinica.repositories.ConsultaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -94,4 +92,23 @@ public class PacienteService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<ConsultaDTO> relatorioConsultasUltimosMeses(Integer idPaciente, Integer meses) {
+        List<Map<String, Object>> consultas = consultaRepository.relatorioConsultasUltimosMeses(idPaciente, meses);
+
+        return consultas.stream().map(c -> {
+            ConsultaDTO dto = new ConsultaDTO();
+            dto.setId((Integer) c.get("idConsulta"));
+            dto.setDataConsulta(((java.sql.Date) c.get("dataConsulta")).toLocalDate());
+            dto.setHoraInicio(((java.sql.Time) c.get("horaInicio")).toLocalTime());
+            dto.setHoraFim(((java.sql.Time) c.get("horaFim")).toLocalTime());
+            dto.setStatus((String) c.get("status"));
+            dto.setNomeMedico((String) c.get("nomeMedico"));
+            dto.setNomePaciente((String) c.get("nomePaciente"));
+            return dto;
+        }).collect(Collectors.toList());
+
+    }
+
 }

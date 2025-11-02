@@ -79,4 +79,25 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Integer> {
                         "INNER JOIN medicos m ON m.id_medico = c.fk_id_medico " +
                         "WHERE c.data_consulta = :data", nativeQuery = true)
         List<Map<String, Object>> buscarConsultasPorData(@Param("data") LocalDate data);
+
+        @Query(value = """
+                        SELECT
+                            c.id_consulta AS idConsulta,
+                            c.data_consulta AS dataConsulta,
+                            c.hora_inicio AS horaInicio,
+                            c.hora_fim AS horaFim,
+                            c.status AS status,
+                            m.nome AS nomeMedico,
+                            p.nome AS nomePaciente
+                        FROM consultas c
+                        INNER JOIN medicos m ON m.id_medico = c.fk_id_medico
+                        INNER JOIN pacientes p ON p.id_paciente = c.fk_id_paciente
+                        WHERE c.fk_id_paciente = :idPaciente
+                          AND c.data_consulta >= DATE_SUB(CURDATE(), INTERVAL :meses MONTH)
+                        ORDER BY c.data_consulta DESC
+                        """, nativeQuery = true)
+        List<Map<String, Object>> relatorioConsultasUltimosMeses(
+                        @Param("idPaciente") Integer idPaciente,
+                        @Param("meses") Integer meses);
+
 }

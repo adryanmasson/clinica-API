@@ -81,4 +81,18 @@ public class PacienteController {
         return ResponseEntity.ok(ApiResponse.sucesso(mensagem, historico));
     }
 
+    @GetMapping("/{id}/relatorio-consultas/{meses}")
+    public ResponseEntity<ApiResponse<List<ConsultaDTO>>> relatorioConsultasUltimosMeses(
+            @PathVariable("id") Integer idPaciente,
+            @PathVariable("meses") Integer meses) {
+
+        List<ConsultaDTO> relatorio = pacienteService.relatorioConsultasUltimosMeses(idPaciente, meses);
+
+        String mensagem = relatorio.isEmpty()
+                ? "Nenhuma consulta encontrada nos últimos " + meses + " meses."
+                : "Relatório de consultas dos últimos " + meses + " meses retornado com sucesso.";
+
+        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, relatorio));
+    }
+
 }
