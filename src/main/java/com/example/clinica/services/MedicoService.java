@@ -2,6 +2,7 @@ package com.example.clinica.services;
 
 import com.example.clinica.models.Medico;
 import com.example.clinica.dto.ConsultaDTO;
+import com.example.clinica.models.Consulta;
 import com.example.clinica.models.ConsultaStatus;
 import com.example.clinica.models.Especialidade;
 import com.example.clinica.repositories.MedicoRepository;
@@ -10,6 +11,9 @@ import com.example.clinica.repositories.EspecialidadeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -130,6 +134,48 @@ public class MedicoService {
             dto.setNomePaciente((String) c.get("nomePaciente"));
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Map<String, LocalTime>> buscarHorariosDisponiveis(Integer idMedico, LocalDate data) {
+        List<Consulta> consultas = consultaRepository.findByMedicoIdAndDataConsulta(idMedico, data);
+
+        LocalTime horaAtual = LocalTime.of(8, 0);
+        LocalTime horaFinal = LocalTime.of(18, 0);
+
+        List<Map<String, LocalTime>> horariosDisponiveis = new ArrayList<>();
+        LocalTime blocoInicio = null;
+
+        while (horaAtual.isBefore(horaFinal)) {
+            LocalTime slotInicio = horaAtual;
+            LocalTime slotFim = slotInicio.plusMinutes(30);
+
+            boolean ocupado = consultas.stream()
+                    .anyMatch(c -> slotInicio.isBefore(c.getHora_fim()) && slotFim.isAfter(c.getHora_inicio()));
+
+            if (!ocupado) {
+                if (blocoInicio == null) {
+                    blocoInicio = slotInicio;
+                }
+            } else {
+                if (blocoInicio != null) {
+                    horariosDisponiveis.add(Map.of(
+                            "horaInicio", blocoInicio,
+                            "horaFim", slotInicio));
+                    blocoInicio = null;
+                }
+            }
+
+            horaAtual = slotFim;
+        }
+
+        if (blocoInicio != null) {
+            horariosDisponiveis.add(Map.of(
+                    "horaInicio", blocoInicio,
+                    "horaFim", horaFinal));
+        }
+
+        return horariosDisponiveis;
     }
 
 }

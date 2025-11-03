@@ -4,10 +4,15 @@ import com.example.clinica.dto.ApiResponse;
 import com.example.clinica.dto.ConsultaDTO;
 import com.example.clinica.models.Medico;
 import com.example.clinica.services.MedicoService;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/medicos")
@@ -95,6 +100,19 @@ public class MedicoController {
                 : "Próximas consultas do médico retornadas com sucesso.";
 
         return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+    }
+
+    @GetMapping("/{id}/horarios-disponiveis")
+    public ResponseEntity<ApiResponse<List<Map<String, LocalTime>>>> buscarHorariosDisponiveis(
+            @PathVariable("id") Integer idMedico,
+            @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate data) {
+
+        List<Map<String, LocalTime>> horarios = medicoService.buscarHorariosDisponiveis(idMedico, data);
+        String msg = horarios.isEmpty()
+                ? "Nenhum horário disponível."
+                : "Horários disponíveis retornados com sucesso.";
+
+        return ResponseEntity.ok(ApiResponse.sucesso(msg, horarios));
     }
 
 }

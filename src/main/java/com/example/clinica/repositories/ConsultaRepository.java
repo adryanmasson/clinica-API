@@ -136,4 +136,8 @@ public interface ConsultaRepository extends JpaRepository<Consulta, Integer> {
       """, nativeQuery = true)
   List<Map<String, Object>> relatorioProximasConsultas(@Param("idMedico") Integer idMedico);
 
+  @Query("SELECT c FROM Consulta c WHERE c.fkIdMedico = :idMedico AND c.data_consulta = :data")
+  List<Consulta> findByMedicoIdAndDataConsulta(@Param("idMedico") Integer idMedico,
+      @Param("data") LocalDate data);
+
 }
