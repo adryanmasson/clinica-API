@@ -111,4 +111,9 @@ public class PacienteService {
 
     }
 
+    @Transactional(readOnly = true)
+    public List<Map<String, Object>> contarPacientesPorEspecialidade() {
+        return pacienteRepository.contarPacientesPorEspecialidade();
+    }
+
 }

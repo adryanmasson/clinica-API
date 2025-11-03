@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/pacientes")
@@ -93,6 +94,17 @@ public class PacienteController {
                 : "Relatório de consultas dos últimos " + meses + " meses retornado com sucesso.";
 
         return ResponseEntity.ok(ApiResponse.sucesso(mensagem, relatorio));
+    }
+
+    @GetMapping("/relatorio/especialidades")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> contarPacientesPorEspecialidade() {
+        List<Map<String, Object>> resultado = pacienteService.contarPacientesPorEspecialidade();
+
+        String mensagem = resultado.isEmpty()
+                ? "Nenhuma especialidade encontrada."
+                : "Contagem de pacientes por especialidade retornada com sucesso.";
+
+        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, resultado));
     }
 
 }

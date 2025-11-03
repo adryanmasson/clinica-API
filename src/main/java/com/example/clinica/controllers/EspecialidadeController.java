@@ -2,7 +2,6 @@ package com.example.clinica.controllers;
 
 import com.example.clinica.dto.ApiResponse;
 import com.example.clinica.models.Especialidade;
-import com.example.clinica.models.Medico;
 import com.example.clinica.services.EspecialidadeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

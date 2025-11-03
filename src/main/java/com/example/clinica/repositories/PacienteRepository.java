@@ -36,4 +36,17 @@ public interface PacienteRepository extends JpaRepository<Paciente, Integer> {
             """, nativeQuery = true)
     List<Map<String, Object>> listarHistoricoPaciente(@Param("idPaciente") Integer idPaciente);
 
+    @Query(value = """
+                SELECT
+                    e.nome AS especialidade,
+                    COUNT(DISTINCT p.id_paciente) AS totalPacientes
+                FROM consultas c
+                INNER JOIN pacientes p ON p.id_paciente = c.fk_id_paciente
+                INNER JOIN medicos m ON m.id_medico = c.fk_id_medico
+                INNER JOIN especialidades e ON e.id_especialidade = m.fk_id_especialidade
+                GROUP BY e.nome
+                ORDER BY totalPacientes DESC
+            """, nativeQuery = true)
+    List<Map<String, Object>> contarPacientesPorEspecialidade();
+
 }
