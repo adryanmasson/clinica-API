@@ -115,4 +115,21 @@ public class MedicoService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<ConsultaDTO> relatorioProximasConsultas(Integer idMedico) {
+        List<Map<String, Object>> consultas = consultaRepository.relatorioProximasConsultas(idMedico);
+
+        return consultas.stream().map(c -> {
+            ConsultaDTO dto = new ConsultaDTO();
+            dto.setId((Integer) c.get("idConsulta"));
+            dto.setDataConsulta(((java.sql.Date) c.get("dataConsulta")).toLocalDate());
+            dto.setHoraInicio(((java.sql.Time) c.get("horaInicio")).toLocalTime());
+            dto.setHoraFim(((java.sql.Time) c.get("horaFim")).toLocalTime());
+            dto.setStatus((String) c.get("status"));
+            dto.setNomeMedico((String) c.get("nomeMedico"));
+            dto.setNomePaciente((String) c.get("nomePaciente"));
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }

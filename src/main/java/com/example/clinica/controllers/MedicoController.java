@@ -84,4 +84,17 @@ public class MedicoController {
         return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
     }
 
+    @GetMapping("/{id}/proximas-consultas")
+    public ResponseEntity<ApiResponse<List<ConsultaDTO>>> relatorioProximasConsultas(
+            @PathVariable Integer id) {
+
+        List<ConsultaDTO> consultas = medicoService.relatorioProximasConsultas(id);
+
+        String mensagem = consultas.isEmpty()
+                ? "Nenhuma consulta futura encontrada para este médico."
+                : "Próximas consultas do médico retornadas com sucesso.";
+
+        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+    }
+
 }
