@@ -578,9 +578,8 @@ DB_PASSWORD=sua_senha
 
 ### Infraestrutura Azure
 
-- **App Service**: Plan Basic B1
-- **Azure SQL Database**: GeneralPurpose Gen5 (2 vCores)
-- **Region**: West US 2
+- **App Service**: Plan Gratuito F1 - Brazil South
+- **Azure SQL Database**: GeneralPurpose Gen5 (2 vCores) - West US 2
 
 ---
 
@@ -597,21 +596,6 @@ mvn test jacoco:report
 ```
 
 > **Nota**: Testes de integração com Testcontainers foram removidos devido a incompatibilidades com Windows. Recomendamos testes manuais ou uso de ambiente Linux para testes de integração.
-
----
-
-## 📊 Funcionalidades Futuras
-
-- [ ] Autenticação JWT com refresh tokens
-- [ ] Sistema de notificações (email/SMS) para consultas
-- [ ] Integração com calendário (Google Calendar, Outlook)
-- [ ] Dashboard com métricas e relatórios
-- [ ] Sistema de permissões por perfil (Admin, Médico, Recepcionista)
-- [ ] Anexos em prontuários (exames, laudos)
-- [ ] Busca avançada com filtros múltiplos
-- [ ] Exportação de relatórios (PDF, Excel)
-- [ ] API de teleconsulta
-- [ ] Sistema de filas de espera
 
 ---
 

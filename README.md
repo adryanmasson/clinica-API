@@ -600,21 +600,6 @@ mvn test jacoco:report
 
 ---
 
-## 📊 Future Features
-
-- [ ] JWT Authentication with refresh tokens
-- [ ] Notification system (email/SMS) for appointments
-- [ ] Calendar integration (Google Calendar, Outlook)
-- [ ] Dashboard with metrics and reports
-- [ ] Role-based permissions (Admin, Doctor, Receptionist)
-- [ ] Attachments in medical records (exams, reports)
-- [ ] Advanced search with multiple filters
-- [ ] Report exports (PDF, Excel)
-- [ ] Telemedicine API
-- [ ] Waiting queue system
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! To contribute:
