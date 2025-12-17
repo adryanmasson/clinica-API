@@ -15,96 +15,96 @@ import java.util.Map;
 @RestController
 @RequestMapping("/patients")
 public class PatientController {
-    private final PatientService pacienteService;
+    private final PatientService patientService;
 
-    public PatientController(PatientService pacienteService) {
-        this.pacienteService = pacienteService;
+    public PatientController(PatientService patientService) {
+        this.patientService = patientService;
     }
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<Patient>>> listPatients() {
-        List<Patient> pacientes = pacienteService.listPatients();
-        String mensagem = pacientes.isEmpty()
+        List<Patient> patients = patientService.listPatients();
+        String message = patients.isEmpty()
                 ? "No patients found."
                 : "Patients listed successfully.";
-        ApiResponse<List<Patient>> body = ApiResponse.success(mensagem, pacientes);
+        ApiResponse<List<Patient>> body = ApiResponse.success(message, patients);
 
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Patient>> findPatientById(@PathVariable Integer id) {
-        Patient patient = pacienteService.findPatientById(id);
+        Patient patient = patientService.findPatientById(id);
         ApiResponse<Patient> body = ApiResponse.success("Patient found successfully.", patient);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Patient>> createPatient(@RequestBody Patient patient) {
-        Patient criado = pacienteService.createPatient(patient);
-        ApiResponse<Patient> body = ApiResponse.success("Patient created successfully.", criado);
+        Patient created = patientService.createPatient(patient);
+        ApiResponse<Patient> body = ApiResponse.success("Patient created successfully.", created);
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Patient>> updatePatient(
             @PathVariable Integer id,
-            @RequestBody Patient pacienteAtualizado) {
-        Patient atualizado = pacienteService.updatePatient(id, pacienteAtualizado);
-        ApiResponse<Patient> body = ApiResponse.success("Patient updated successfully.", atualizado);
+            @RequestBody Patient updatedPatient) {
+        Patient updated = patientService.updatePatient(id, updatedPatient);
+        ApiResponse<Patient> body = ApiResponse.success("Patient updated successfully.", updated);
         return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> deletePatient(@PathVariable Integer id) {
-        pacienteService.deletePatient(id);
+        patientService.deletePatient(id);
         ApiResponse<Void> body = ApiResponse.success("Patient deleted successfully.", null);
         return ResponseEntity.ok(body);
     }
 
-    @GetMapping("/{id}/idade")
-    public ResponseEntity<ApiResponse<Integer>> idadePaciente(@PathVariable Integer id) {
-        Integer idade = pacienteService.calculatePatientAge(id);
-        ApiResponse<Integer> body = ApiResponse.success("Age calculated successfully.", idade);
+    @GetMapping("/{id}/age")
+    public ResponseEntity<ApiResponse<Integer>> calculatePatientAge(@PathVariable Integer id) {
+        Integer age = patientService.calculatePatientAge(id);
+        ApiResponse<Integer> body = ApiResponse.success("Age calculated successfully.", age);
         return ResponseEntity.ok(body);
     }
 
-    @GetMapping("/{id}/historico")
+    @GetMapping("/{id}/history")
     public ResponseEntity<ApiResponse<List<PatientHistoryDTO>>> listPatientHistory(
             @PathVariable Integer id) {
 
-        List<PatientHistoryDTO> historico = pacienteService.listPatientHistory(id);
+        List<PatientHistoryDTO> history = patientService.listPatientHistory(id);
 
-        String mensagem = historico.isEmpty()
+        String message = history.isEmpty()
                 ? "No history found for this patient."
                 : "Patient history returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.success(mensagem, historico));
+        return ResponseEntity.ok(ApiResponse.success(message, history));
     }
 
-    @GetMapping("/{id}/relatorio-consultas/{meses}")
+    @GetMapping("/{id}/report/appointments/{months}")
     public ResponseEntity<ApiResponse<List<AppointmentDTO>>> appointmentsReportLastMonths(
             @PathVariable("id") Integer patientId,
-            @PathVariable("meses") Integer meses) {
+            @PathVariable("months") Integer months) {
 
-        List<AppointmentDTO> relatorio = pacienteService.appointmentsReportLastMonths(patientId, meses);
+        List<AppointmentDTO> report = patientService.appointmentsReportLastMonths(patientId, months);
 
-        String mensagem = relatorio.isEmpty()
-                ? "No appointments found in the last " + meses + " months."
-                : "Appointment report for the last " + meses + " months returned successfully.";
+        String message = report.isEmpty()
+                ? "No appointments found in the last " + months + " months."
+                : "Appointment report for the last " + months + " months returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.success(mensagem, relatorio));
+        return ResponseEntity.ok(ApiResponse.success(message, report));
     }
 
-    @GetMapping("/relatorio/especialidades")
+    @GetMapping("/report/specialties")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> countPatientsBySpecialty() {
-        List<Map<String, Object>> resultado = pacienteService.countPatientsBySpecialty();
+        List<Map<String, Object>> result = patientService.countPatientsBySpecialty();
 
-        String mensagem = resultado.isEmpty()
+        String message = result.isEmpty()
                 ? "No specialties found."
                 : "Patient count by specialty returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.success(mensagem, resultado));
+        return ResponseEntity.ok(ApiResponse.success(message, result));
     }
 
 }
