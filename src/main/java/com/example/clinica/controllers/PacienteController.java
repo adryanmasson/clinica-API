@@ -25,9 +25,9 @@ public class PacienteController {
     public ResponseEntity<ApiResponse<List<Paciente>>> listarPacientes() {
         List<Paciente> pacientes = pacienteService.listarPacientes();
         String mensagem = pacientes.isEmpty()
-                ? "Nenhum paciente encontrado."
-                : "Pacientes listados com sucesso.";
-        ApiResponse<List<Paciente>> body = ApiResponse.sucesso(mensagem, pacientes);
+                ? "No patients found."
+                : "Patients listed successfully.";
+        ApiResponse<List<Paciente>> body = ApiResponse.success(mensagem, pacientes);
 
         return ResponseEntity.ok(body);
     }
@@ -35,14 +35,14 @@ public class PacienteController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Paciente>> buscarPacientePorId(@PathVariable Integer id) {
         Paciente paciente = pacienteService.buscarPacientePorId(id);
-        ApiResponse<Paciente> body = ApiResponse.sucesso("Paciente encontrado com sucesso.", paciente);
+        ApiResponse<Paciente> body = ApiResponse.success("Patient found successfully.", paciente);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Paciente>> criarPaciente(@RequestBody Paciente paciente) {
         Paciente criado = pacienteService.criarPaciente(paciente);
-        ApiResponse<Paciente> body = ApiResponse.sucesso("Paciente criado com sucesso.", criado);
+        ApiResponse<Paciente> body = ApiResponse.success("Patient created successfully.", criado);
         return ResponseEntity.status(HttpStatus.CREATED).body(body);
     }
 
@@ -51,21 +51,21 @@ public class PacienteController {
             @PathVariable Integer id,
             @RequestBody Paciente pacienteAtualizado) {
         Paciente atualizado = pacienteService.atualizarPaciente(id, pacienteAtualizado);
-        ApiResponse<Paciente> body = ApiResponse.sucesso("Paciente atualizado com sucesso.", atualizado);
+        ApiResponse<Paciente> body = ApiResponse.success("Patient updated successfully.", atualizado);
         return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> excluirPaciente(@PathVariable Integer id) {
         pacienteService.excluirPaciente(id);
-        ApiResponse<Void> body = ApiResponse.sucesso("Paciente excluído com sucesso.", null);
+        ApiResponse<Void> body = ApiResponse.success("Patient deleted successfully.", null);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}/idade")
     public ResponseEntity<ApiResponse<Integer>> idadePaciente(@PathVariable Integer id) {
         Integer idade = pacienteService.calcularIdadePaciente(id);
-        ApiResponse<Integer> body = ApiResponse.sucesso("Idade calculada com sucesso.", idade);
+        ApiResponse<Integer> body = ApiResponse.success("Age calculated successfully.", idade);
         return ResponseEntity.ok(body);
     }
 
@@ -76,10 +76,10 @@ public class PacienteController {
         List<HistoricoPacienteDTO> historico = pacienteService.listarHistoricoPaciente(id);
 
         String mensagem = historico.isEmpty()
-                ? "Nenhum histórico encontrado para este paciente."
-                : "Histórico do paciente retornado com sucesso.";
+                ? "No history found for this patient."
+                : "Patient history returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, historico));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, historico));
     }
 
     @GetMapping("/{id}/relatorio-consultas/{meses}")
@@ -90,10 +90,10 @@ public class PacienteController {
         List<ConsultaDTO> relatorio = pacienteService.relatorioConsultasUltimosMeses(idPaciente, meses);
 
         String mensagem = relatorio.isEmpty()
-                ? "Nenhuma consulta encontrada nos últimos " + meses + " meses."
-                : "Relatório de consultas dos últimos " + meses + " meses retornado com sucesso.";
+                ? "No appointments found in the last " + meses + " months."
+                : "Appointment report for the last " + meses + " months returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, relatorio));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, relatorio));
     }
 
     @GetMapping("/relatorio/especialidades")
@@ -101,10 +101,10 @@ public class PacienteController {
         List<Map<String, Object>> resultado = pacienteService.contarPacientesPorEspecialidade();
 
         String mensagem = resultado.isEmpty()
-                ? "Nenhuma especialidade encontrada."
-                : "Contagem de pacientes por especialidade retornada com sucesso.";
+                ? "No specialties found."
+                : "Patient count by specialty returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, resultado));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, resultado));
     }
 
 }

@@ -25,21 +25,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     protected ResponseEntity<ApiResponse<Object>> handleRuntime(RuntimeException ex) {
-        ApiResponse<Object> body = ApiResponse.erro(ex.getMessage() == null ? "Erro interno" : ex.getMessage());
+        ApiResponse<Object> body = ApiResponse.error(ex.getMessage() == null ? "Internal error" : ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler({ EntityNotFoundException.class, NoSuchElementException.class })
     protected ResponseEntity<ApiResponse<Object>> handleNotFound(RuntimeException ex) {
         ApiResponse<Object> body = ApiResponse
-                .erro(ex.getMessage() == null ? "Recurso não encontrado" : ex.getMessage());
+                .error(ex.getMessage() == null ? "Resource not found" : ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     protected ResponseEntity<ApiResponse<Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
         String msg = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
-        ApiResponse<Object> body = ApiResponse.erro("Violação de integridade: " + (msg == null ? "" : msg));
+        ApiResponse<Object> body = ApiResponse.error("Integrity violation: " + (msg == null ? "" : msg));
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
@@ -48,7 +48,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
-        ApiResponse<Object> body = ApiResponse.erro("Corpo da requisição inválido ou mal formado: " + ex.getMessage());
+        ApiResponse<Object> body = ApiResponse.error("Invalid or malformed request body: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
@@ -63,16 +63,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .collect(Collectors.joining("; "));
 
-        ApiResponse<Object> body = ApiResponse.erro("Erros de validação: " + errors);
+        ApiResponse<Object> body = ApiResponse.error("Validation errors: " + errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     protected ResponseEntity<ApiResponse<Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        String msg = String.format("Parâmetro '%s' inválido: valor='%s'. Esperado: %s",
+        String msg = String.format("Invalid parameter '%s': value='%s'. Expected: %s",
                 ex.getName(), ex.getValue(),
-                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "tipo correto");
-        ApiResponse<Object> body = ApiResponse.erro(msg);
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "correct type");
+        ApiResponse<Object> body = ApiResponse.error(msg);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
@@ -81,7 +81,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers,
             HttpStatusCode status,
             WebRequest request) {
-        ApiResponse<Object> body = ApiResponse.erro("Tipo de mídia não suportado: " + ex.getContentType());
+        ApiResponse<Object> body = ApiResponse.error("Unsupported media type: " + ex.getContentType());
         return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(body);
     }
 
@@ -89,7 +89,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     protected ResponseEntity<ApiResponse<Object>> handleAll(Exception ex) {
         ApiResponse<Object> body = ApiResponse
-                .erro("Erro interno do servidor: " + (ex.getMessage() != null ? ex.getMessage() : ""));
+                .error("Internal server error: " + (ex.getMessage() != null ? ex.getMessage() : ""));
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }

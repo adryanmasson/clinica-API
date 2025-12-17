@@ -25,9 +25,9 @@ public class ProntuarioController {
     public ResponseEntity<ApiResponse<List<ProntuarioDTO>>> listarProntuarios() {
         List<ProntuarioDTO> prontuarios = prontuarioService.listarProntuarios();
         String mensagem = prontuarios.isEmpty()
-                ? "Nenhum prontuário encontrado."
-                : "Prontuários retornados com sucesso.";
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, prontuarios));
+                ? "No medical records found."
+                : "Medical records returned successfully.";
+        return ResponseEntity.ok(ApiResponse.success(mensagem, prontuarios));
     }
 
     @GetMapping("/consulta/{idConsulta}")
@@ -35,15 +35,15 @@ public class ProntuarioController {
         ProntuarioDTO dto = prontuarioService.buscarPorConsulta(idConsulta);
         if (dto == null) {
             return ResponseEntity.status(404)
-                    .body(ApiResponse.erro("Prontuário não encontrado para a consulta " + idConsulta));
+                    .body(ApiResponse.error("Medical record not found for appointment " + idConsulta));
         }
-        return ResponseEntity.ok(ApiResponse.sucesso("Prontuário retornado com sucesso.", dto));
+        return ResponseEntity.ok(ApiResponse.success("Medical record returned successfully.", dto));
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<ProntuarioDTO>> criarProntuario(@RequestBody CriarProntuarioDTO dto) {
         ProntuarioDTO criado = prontuarioService.criarProntuario(dto);
-        return ResponseEntity.status(201).body(ApiResponse.sucesso("Prontuário criado com sucesso.", criado));
+        return ResponseEntity.status(201).body(ApiResponse.success("Medical record created successfully.", criado));
     }
 
     @PutMapping("/{id}")
@@ -54,16 +54,16 @@ public class ProntuarioController {
         if (prontuarioAtualizado == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(ApiResponse.sucesso("Prontuário atualizado com sucesso.", prontuarioAtualizado));
+        return ResponseEntity.ok(ApiResponse.success("Medical record updated successfully.", prontuarioAtualizado));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> excluirProntuario(@PathVariable Integer id) {
         boolean excluido = prontuarioService.excluirProntuario(id);
         if (excluido) {
-            return ResponseEntity.ok(ApiResponse.sucesso("Prontuário excluído com sucesso.", null));
+            return ResponseEntity.ok(ApiResponse.success("Medical record deleted successfully.", null));
         } else {
-            return ResponseEntity.status(404).body(ApiResponse.erro("Prontuário não encontrado."));
+            return ResponseEntity.status(404).body(ApiResponse.error("Medical record not found."));
         }
     }
 

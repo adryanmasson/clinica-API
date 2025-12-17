@@ -22,23 +22,23 @@ public class EspecialidadeController {
     public ResponseEntity<ApiResponse<List<Especialidade>>> listarEspecialidades() {
         List<Especialidade> especialidades = especialidadeService.listarEspecialidades();
         String mensagem = especialidades.isEmpty()
-                ? "Nenhuma especialidade encontrada."
-                : "Especialidades listadas com sucesso.";
-        ApiResponse<List<Especialidade>> body = ApiResponse.sucesso(mensagem, especialidades);
+                ? "No specialties found."
+                : "Specialties listed successfully.";
+        ApiResponse<List<Especialidade>> body = ApiResponse.success(mensagem, especialidades);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Especialidade>> buscarEspecialidadePorId(@PathVariable Integer id) {
         Especialidade especialidade = especialidadeService.buscarEspecialidadePorId(id);
-        ApiResponse<Especialidade> body = ApiResponse.sucesso("Especialidade encontrada com sucesso.", especialidade);
+        ApiResponse<Especialidade> body = ApiResponse.success("Specialty found successfully.", especialidade);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Especialidade>> criarEspecialidade(@RequestBody Especialidade especialidade) {
         Especialidade criado = especialidadeService.criarEspecialidade(especialidade);
-        ApiResponse<Especialidade> body = ApiResponse.sucesso("Especialidade criada com sucesso.", criado);
+        ApiResponse<Especialidade> body = ApiResponse.success("Specialty created successfully.", criado);
         return ResponseEntity.status(201).body(body);
     }
 
@@ -47,14 +47,14 @@ public class EspecialidadeController {
             @PathVariable Integer id,
             @RequestBody Especialidade especialidadeAtualizada) {
         Especialidade atualizado = especialidadeService.atualizarEspecialidade(id, especialidadeAtualizada);
-        ApiResponse<Especialidade> body = ApiResponse.sucesso("Especialidade atualizada com sucesso.", atualizado);
+        ApiResponse<Especialidade> body = ApiResponse.success("Specialty updated successfully.", atualizado);
         return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> excluirEspecialidade(@PathVariable Integer id) {
         especialidadeService.excluirEspecialidade(id);
-        ApiResponse<Void> body = ApiResponse.sucesso("Especialidade excluída com sucesso.", null);
+        ApiResponse<Void> body = ApiResponse.success("Specialty deleted successfully.", null);
         return ResponseEntity.ok(body);
     }
 

@@ -28,23 +28,23 @@ public class MedicoController {
     public ResponseEntity<ApiResponse<List<Medico>>> listarMedicos() {
         List<Medico> medicos = medicoService.listarMedicos();
         String mensagem = medicos.isEmpty()
-                ? "Nenhum medico encontrado."
-                : "Médicos listados com sucesso.";
-        ApiResponse<List<Medico>> body = ApiResponse.sucesso(mensagem, medicos);
+                ? "No doctors found."
+                : "Doctors listed successfully.";
+        ApiResponse<List<Medico>> body = ApiResponse.success(mensagem, medicos);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Medico>> buscarMedicoPorId(@PathVariable Integer id) {
         Medico medico = medicoService.buscarMedicoPorId(id);
-        ApiResponse<Medico> body = ApiResponse.sucesso("Médico encontrado com sucesso.", medico);
+        ApiResponse<Medico> body = ApiResponse.success("Doctor found successfully.", medico);
         return ResponseEntity.ok(body);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse<Medico>> criarMedico(@RequestBody Medico medico) {
         Medico criado = medicoService.criarMedico(medico);
-        ApiResponse<Medico> body = ApiResponse.sucesso("Médico criado com sucesso.", criado);
+        ApiResponse<Medico> body = ApiResponse.success("Doctor created successfully.", criado);
         return ResponseEntity.status(201).body(body);
     }
 
@@ -53,14 +53,14 @@ public class MedicoController {
             @PathVariable Integer id,
             @RequestBody Medico medicoAtualizado) {
         Medico atualizado = medicoService.atualizarMedico(id, medicoAtualizado);
-        ApiResponse<Medico> body = ApiResponse.sucesso("Médico atualizado com sucesso.", atualizado);
+        ApiResponse<Medico> body = ApiResponse.success("Doctor updated successfully.", atualizado);
         return ResponseEntity.ok(body);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> excluirMedico(@PathVariable Integer id) {
         medicoService.excluirMedico(id);
-        ApiResponse<Void> body = ApiResponse.sucesso("Médico excluído com sucesso.", null);
+        ApiResponse<Void> body = ApiResponse.success("Doctor deleted successfully.", null);
         return ResponseEntity.ok(body);
     }
 
@@ -70,10 +70,10 @@ public class MedicoController {
         List<Medico> medicos = medicoService.listarPorEspecialidade(idEspecialidade);
 
         String mensagem = medicos.isEmpty()
-                ? "Não há médicos cadastrados para essa especialidade."
-                : "Médicos encontrados.";
+                ? "No doctors registered for this specialty."
+                : "Doctors found.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, medicos));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, medicos));
     }
 
     @GetMapping("/{id}/relatorio-consultas")
@@ -83,10 +83,10 @@ public class MedicoController {
         List<ConsultaDTO> consultas = medicoService.relatorioConsultasPorMedico(id);
 
         String mensagem = consultas.isEmpty()
-                ? "Nenhuma consulta encontrada para este médico."
-                : "Relatório de consultas do médico retornado com sucesso.";
+                ? "No appointments found for this doctor."
+                : "Doctor's appointment report returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, consultas));
     }
 
     @GetMapping("/{id}/proximas-consultas")
@@ -96,10 +96,10 @@ public class MedicoController {
         List<ConsultaDTO> consultas = medicoService.relatorioProximasConsultas(id);
 
         String mensagem = consultas.isEmpty()
-                ? "Nenhuma consulta futura encontrada para este médico."
-                : "Próximas consultas do médico retornadas com sucesso.";
+                ? "No future appointments found for this doctor."
+                : "Doctor's upcoming appointments returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, consultas));
     }
 
     @GetMapping("/{id}/horarios-disponiveis")
@@ -109,10 +109,10 @@ public class MedicoController {
 
         List<Map<String, LocalTime>> horarios = medicoService.buscarHorariosDisponiveis(idMedico, data);
         String msg = horarios.isEmpty()
-                ? "Nenhum horário disponível."
-                : "Horários disponíveis retornados com sucesso.";
+                ? "No available time slots."
+                : "Available time slots returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(msg, horarios));
+        return ResponseEntity.ok(ApiResponse.success(msg, horarios));
     }
 
 }

@@ -2,29 +2,29 @@ package com.example.clinica.dto;
 
 public class ApiResponse<T> {
     private String status;
-    private String mensagem;
+    private String message;
     private T data;
 
     public ApiResponse() {
     }
 
-    public ApiResponse(String status, String mensagem, T data) {
+    public ApiResponse(String status, String message, T data) {
         this.status = status;
-        this.mensagem = mensagem;
+        this.message = message;
         this.data = data;
     }
 
-    // fábricas de conveniência
-    public static <T> ApiResponse<T> sucesso(String mensagem, T data) {
-        return new ApiResponse<>("sucesso", mensagem, data);
+    // convenience factories
+    public static <T> ApiResponse<T> success(String message, T data) {
+        return new ApiResponse<>("success", message, data);
     }
 
-    public static <T> ApiResponse<T> sucesso(String mensagem) {
-        return new ApiResponse<>("sucesso", mensagem, null);
+    public static <T> ApiResponse<T> success(String message) {
+        return new ApiResponse<>("success", message, null);
     }
 
-    public static <T> ApiResponse<T> erro(String mensagem) {
-        return new ApiResponse<>("erro", mensagem, null);
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>("error", message, null);
     }
 
     // getters / setters
@@ -36,12 +36,12 @@ public class ApiResponse<T> {
         this.status = status;
     }
 
-    public String getMensagem() {
-        return mensagem;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMensagem(String mensagem) {
-        this.mensagem = mensagem;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public T getData() {

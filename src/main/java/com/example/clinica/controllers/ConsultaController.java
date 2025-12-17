@@ -32,15 +32,15 @@ public class ConsultaController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ConsultaDTO>>> listarConsultas() {
         List<ConsultaDTO> consultas = consultaService.listarConsultas();
-        String mensagem = consultas.isEmpty() ? "Nenhuma consulta encontrada." : "Consultas listadas com sucesso.";
-        ApiResponse<List<ConsultaDTO>> body = ApiResponse.sucesso(mensagem, consultas);
+        String mensagem = consultas.isEmpty() ? "No appointments found." : "Appointments listed successfully.";
+        ApiResponse<List<ConsultaDTO>> body = ApiResponse.success(mensagem, consultas);
         return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ConsultaDTO>> buscarConsultaPorId(@PathVariable Integer id) {
         ConsultaDTO consulta = consultaService.buscarConsultaPorId(id);
-        ApiResponse<ConsultaDTO> body = ApiResponse.sucesso("Consulta encontrada com sucesso.", consulta);
+        ApiResponse<ConsultaDTO> body = ApiResponse.success("Appointment found successfully.", consulta);
         return ResponseEntity.ok(body);
     }
 
@@ -48,7 +48,7 @@ public class ConsultaController {
     public ResponseEntity<ApiResponse<ConsultaDTO>> agendarConsulta(@RequestBody AgendarConsultaDTO dto) {
         ConsultaDTO consulta = consultaService.agendarConsulta(dto.getIdPaciente(), dto.getIdMedico(),
                 dto.getData(), dto.getHoraInicio(), dto.getHoraFim());
-        return ResponseEntity.ok(ApiResponse.sucesso("Consulta agendada com sucesso", consulta));
+        return ResponseEntity.ok(ApiResponse.success("Appointment scheduled successfully", consulta));
 
     }
 
@@ -58,13 +58,13 @@ public class ConsultaController {
             @RequestBody AtualizarConsultaDTO dto) {
 
         ConsultaDTO consultaAtualizada = consultaService.atualizarConsulta(id, dto);
-        return ResponseEntity.ok(ApiResponse.sucesso("Consulta atualizada com sucesso", consultaAtualizada));
+        return ResponseEntity.ok(ApiResponse.success("Appointment updated successfully", consultaAtualizada));
     }
 
     @PutMapping("/{id}/cancelar")
     public ResponseEntity<ApiResponse<ConsultaDTO>> cancelar(@PathVariable Integer id) {
         ConsultaDTO consultaCancelada = consultaService.cancelarConsulta(id);
-        return ResponseEntity.ok(ApiResponse.sucesso("Consulta cancelada com sucesso", consultaCancelada));
+        return ResponseEntity.ok(ApiResponse.success("Appointment cancelled successfully", consultaCancelada));
     }
 
     @GetMapping("/paciente/{id}")
@@ -72,10 +72,10 @@ public class ConsultaController {
         List<ConsultaDTO> consultas = consultaService.listarConsultasPorPaciente(id);
 
         String mensagem = consultas.isEmpty()
-                ? "Nenhuma consulta encontrada para o paciente."
-                : "Consultas do paciente retornadas com sucesso.";
+                ? "No appointments found for the patient."
+                : "Patient's appointments returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, consultas));
     }
 
     @GetMapping("/medico/{id}")
@@ -83,10 +83,10 @@ public class ConsultaController {
         List<ConsultaDTO> consultas = consultaService.listarConsultasPorMedico(id);
 
         String mensagem = consultas.isEmpty()
-                ? "Nenhuma consulta encontrada para o médico."
-                : "Consultas do médico retornadas com sucesso.";
+                ? "No appointments found for the doctor."
+                : "Doctor's appointments returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, consultas));
     }
 
     @GetMapping("/data/{data}")
@@ -95,10 +95,10 @@ public class ConsultaController {
         List<ConsultaDTO> consultas = consultaService.listarConsultasPorData(data);
 
         String mensagem = consultas.isEmpty()
-                ? "Nenhuma consulta encontrada para esta data."
-                : "Consultas da data retornadas com sucesso.";
+                ? "No appointments found for this date."
+                : "Appointments for the date returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.sucesso(mensagem, consultas));
+        return ResponseEntity.ok(ApiResponse.success(mensagem, consultas));
     }
 
 }
