@@ -76,7 +76,7 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(message, doctors));
     }
 
-    @GetMapping("/{id}/relatorio-consultas")
+    @GetMapping("/{id}/report/appointments")
     public ResponseEntity<ApiResponse<List<AppointmentDTO>>> appointmentReportByDoctor(
             @PathVariable Integer id) {
 
@@ -89,7 +89,7 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(message, appointments));
     }
 
-    @GetMapping("/{id}/proximas-consultas")
+    @GetMapping("/{id}/upcoming/appointments")
     public ResponseEntity<ApiResponse<List<AppointmentDTO>>> upcomingAppointmentsReport(
             @PathVariable Integer id) {
 
@@ -102,17 +102,17 @@ public class DoctorController {
         return ResponseEntity.ok(ApiResponse.success(message, appointments));
     }
 
-    @GetMapping("/{id}/horarios-disponiveis")
+    @GetMapping("/{id}/available-slots")
     public ResponseEntity<ApiResponse<List<Map<String, LocalTime>>>> findAvailableTimeSlots(
             @PathVariable("id") Integer doctorId,
-            @RequestParam("data") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
         List<Map<String, LocalTime>> timeSlots = doctorService.findAvailableTimeSlots(doctorId, date);
-        String msg = timeSlots.isEmpty()
+        String message = timeSlots.isEmpty()
                 ? "No available time slots."
                 : "Available time slots returned successfully.";
 
-        return ResponseEntity.ok(ApiResponse.success(msg, timeSlots));
+        return ResponseEntity.ok(ApiResponse.success(message, timeSlots));
     }
 
 }
