@@ -72,10 +72,20 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
+
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>8.0.32</version> <!-- ou a versão mais recente disponível -->
+		</dependency>
+
+		<!-- Microsoft SQL Server JDBC driver (adicionado para compatibilidade com SQL Server). -->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>11.2.0.jre17</version>
+			<scope>runtime</scope>
 		</dependency>
 
 
@@ -108,6 +118,8 @@
 					</excludes>
 				</configuration>
 			</plugin>
+
+
 		</plugins>
 	</build>
 

@@ -5,11 +5,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @NamedStoredProcedureQuery(name = "Consulta.criar_consulta", procedureName = "criar_consulta", parameters = {
-        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_id_paciente", type = Integer.class),
-        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_id_medico", type = Integer.class),
-        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_data_consulta", type = java.time.LocalDate.class),
-        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_hora_inicio", type = java.time.LocalTime.class),
-        @StoredProcedureParameter(mode = ParameterMode.IN, name = "p_hora_fim", type = java.time.LocalTime.class)
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "id_paciente", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "id_medico", type = Integer.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "data_consulta", type = java.time.LocalDate.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora_inicio", type = java.time.LocalTime.class),
+        @StoredProcedureParameter(mode = ParameterMode.IN, name = "hora_fim", type = java.time.LocalTime.class)
 })
 
 @Entity
@@ -38,7 +38,7 @@ public class Consulta {
     private LocalTime hora_fim;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum('AGENDADA','REALIZADA','CANCELADA')")
+    @Column(length = 20)
     private ConsultaStatus status = ConsultaStatus.AGENDADA;
 
     public Integer getId_consulta() {

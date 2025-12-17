@@ -13,8 +13,8 @@ public class Paciente {
 
     private String nome;
 
-    @Column(columnDefinition = "enum('M','F','OUTRO')")
     @Enumerated(EnumType.STRING)
+    @Column(length = 10)
     private Sexo sexo;
 
     private String cpf;
