@@ -39,7 +39,7 @@ public class AppointmentController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<AppointmentDTO>> findAppointmentById(@PathVariable Integer id) {
-        AppointmentDTO appointment = consultaService.buscarConsultaPorId(id);
+        AppointmentDTO appointment = consultaService.findAppointmentById(id);
         ApiResponse<AppointmentDTO> body = ApiResponse.success("Appointment found successfully.", appointment);
         return ResponseEntity.ok(body);
     }
@@ -69,7 +69,7 @@ public class AppointmentController {
 
     @GetMapping("/patient/{id}")
     public ResponseEntity<ApiResponse<List<AppointmentDTO>>> listByPatient(@PathVariable Integer id) {
-        List<AppointmentDTO> appointments = consultaService.listarConsultasPorPaciente(id);
+        List<AppointmentDTO> appointments = consultaService.listAppointmentsByPatient(id);
 
         String message = appointments.isEmpty()
                 ? "No appointments found for the patient."
@@ -80,7 +80,7 @@ public class AppointmentController {
 
     @GetMapping("/doctor/{id}")
     public ResponseEntity<ApiResponse<List<AppointmentDTO>>> listByDoctor(@PathVariable Integer id) {
-        List<AppointmentDTO> appointments = consultaService.listarConsultasPorMedico(id);
+        List<AppointmentDTO> appointments = consultaService.listAppointmentsByDoctor(id);
 
         String message = appointments.isEmpty()
                 ? "No appointments found for the doctor."
@@ -92,7 +92,7 @@ public class AppointmentController {
     @GetMapping("/date/{date}")
     public ResponseEntity<ApiResponse<List<AppointmentDTO>>> listByDate(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<AppointmentDTO> appointments = consultaService.listarConsultasPorData(date);
+        List<AppointmentDTO> appointments = consultaService.listAppointmentsByDate(date);
 
         String message = appointments.isEmpty()
                 ? "No appointments found for this date."

@@ -19,15 +19,15 @@ public interface PatientRepository extends JpaRepository<Patient, Integer> {
 
     @Query(value = """
                 SELECT c.appointment_id AS appointmentId,
-                       c.appointment_date AS dataConsulta,
-                       c.start_time AS horaInicio,
-                       c.end_time AS horaFim,
+                       c.appointment_date AS appointmentDate,
+                       c.start_time AS startTime,
+                       c.end_time AS endTime,
                        c.status AS status,
                        p.record_id AS recordId,
                        p.anamnesis AS anamnesis,
                        p.diagnosis AS diagnosis,
                        p.prescription AS prescription,
-                       m.name AS nomeMedico
+                       m.name AS doctorName
                 FROM appointments c
                 LEFT JOIN medical_records p ON p.appointment_id = c.appointment_id
                 JOIN doctors m ON m.doctor_id = c.doctor_id

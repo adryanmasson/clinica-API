@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 public class AppointmentService {
 
         private final AppointmentRepository appointmentRepository;
-        private final DoctorRepository medicoRepository;
+        private final DoctorRepository doctorRepository;
 
-        public AppointmentService(AppointmentRepository appointmentRepository, DoctorRepository medicoRepository) {
+        public AppointmentService(AppointmentRepository appointmentRepository, DoctorRepository doctorRepository) {
                 this.appointmentRepository = appointmentRepository;
-                this.medicoRepository = medicoRepository;
+                this.doctorRepository = doctorRepository;
         }
 
         public List<AppointmentDTO> listAppointments() {
@@ -36,9 +36,9 @@ public class AppointmentService {
                                 .map(c -> new AppointmentDTO(
                                                 c.getAppointmentId(),
                                                 c.getPatient().getName(),
-                                                medicoRepository.findById(c.getDoctorId())
+                                                doctorRepository.findById(c.getDoctorId())
                                                                 .map(Doctor::getName)
-                                                                .orElse("Médico não encontrado"),
+                                                                .orElse("Doctor not found"),
                                                 c.getAppointmentDate(),
                                                 c.getStartTime(),
                                                 c.getEndTime(),
@@ -46,19 +46,19 @@ public class AppointmentService {
                                 .collect(Collectors.toList());
         }
 
-        public AppointmentDTO buscarConsultaPorId(Integer id) {
+        public AppointmentDTO findAppointmentById(Integer id) {
                 Appointment appointment = appointmentRepository.findById(id)
-                                .orElseThrow(() -> new RuntimeException("Appointment não encontrada."));
+                                .orElseThrow(() -> new RuntimeException("Appointment not found."));
 
-                String nomePaciente = appointment.getPatient().getName();
-                String nomeMedico = medicoRepository.findById(appointment.getDoctorId())
+                String patientName = appointment.getPatient().getName();
+                String doctorName = doctorRepository.findById(appointment.getDoctorId())
                                 .map(Doctor::getName)
-                                .orElse("Médico não encontrado");
+                                .orElse("Doctor not found");
 
                 return new AppointmentDTO(
                                 appointment.getAppointmentId(),
-                                nomePaciente,
-                                nomeMedico,
+                                patientName,
+                                doctorName,
                                 appointment.getAppointmentDate(),
                                 appointment.getStartTime(),
                                 appointment.getEndTime(),
@@ -67,19 +67,19 @@ public class AppointmentService {
 
         @Transactional
         public AppointmentDTO scheduleAppointment(Integer patientId, Integer doctorId,
-                        LocalDate data, LocalTime horaInicio, LocalTime horaFim) {
+                        LocalDate data, LocalTime startTime, LocalTime endTime) {
 
                 try {
-                        appointmentRepository.criarConsulta(patientId, doctorId, data, horaInicio, horaFim);
+                        appointmentRepository.createAppointment(patientId, doctorId, data, startTime, endTime);
                 } catch (DataAccessException ex) {
                         Throwable cause = ex.getMostSpecificCause();
-                        String mensagem = cause != null ? cause.getMessage() : ex.getMessage();
+                        String message = cause != null ? cause.getMessage() : ex.getMessage();
 
-                        throw new RuntimeException(mensagem);
+                        throw new RuntimeException(message);
                 }
 
-                Appointment appointment = appointmentRepository.findInserted(patientId, doctorId, data, horaInicio, horaFim)
-                                .orElseThrow(() -> new RuntimeException("Falha ao recuperar a appointment criada."));
+                Appointment appointment = appointmentRepository.findInserted(patientId, doctorId, data, startTime, endTime)
+                                .orElseThrow(() -> new RuntimeException("Failed to retrieve the created appointment."));
 
                 return new AppointmentDTO(
                                 appointment.getId(),
@@ -94,27 +94,27 @@ public class AppointmentService {
         @Transactional
         public AppointmentDTO updateAppointment(Integer appointmentId, UpdateAppointmentDTO dto) {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new RuntimeException("Appointment não encontrada"));
+                                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
-                if (dto.getDataConsulta() != null || dto.getHoraInicio() != null || dto.getHoraFim() != null) {
-                        LocalDate novaData = dto.getDataConsulta() != null ? dto.getDataConsulta()
+                if (dto.getAppointmentDate() != null || dto.getStartTime() != null || dto.getEndTime() != null) {
+                        LocalDate newDate = dto.getAppointmentDate() != null ? dto.getAppointmentDate()
                                         : appointment.getAppointmentDate();
-                        LocalTime novoInicio = dto.getHoraInicio() != null ? dto.getHoraInicio()
+                        LocalTime newStartTime = dto.getStartTime() != null ? dto.getStartTime()
                                         : appointment.getStartTime();
-                        LocalTime novoFim = dto.getHoraFim() != null ? dto.getHoraFim() : appointment.getEndTime();
+                        LocalTime newEndTime = dto.getEndTime() != null ? dto.getEndTime() : appointment.getEndTime();
 
-                        boolean conflito = !appointmentRepository
-                                        .findByMedicoDataHora(appointment.getDoctorId(), novaData, novoInicio, novoFim,
+                        boolean conflict = !appointmentRepository
+                                        .findByMedicoDataHora(appointment.getDoctorId(), newDate, newStartTime, newEndTime,
                                                         appointment.getAppointmentId())
                                         .isEmpty();
 
-                        if (conflito) {
-                                throw new RuntimeException("Médico já possui appointment agendada neste horário.");
+                        if (conflict) {
+                                throw new RuntimeException("Doctor already has an appointment scheduled at this time.");
                         }
 
-                        appointment.setAppointmentDate(novaData);
-                        appointment.setStartTime(novoInicio);
-                        appointment.setEndTime(novoFim);
+                        appointment.setAppointmentDate(newDate);
+                        appointment.setStartTime(newStartTime);
+                        appointment.setEndTime(newEndTime);
                 }
 
                 if (dto.getStatus() != null) {
@@ -122,97 +122,97 @@ public class AppointmentService {
                                 appointment.setStatus(AppointmentStatus.valueOf(dto.getStatus()));
                         } catch (IllegalArgumentException ex) {
                                 throw new RuntimeException(
-                                                "Status inválido. Valores válidos: AGENDADA, REALIZADA, CANCELADA.");
+                                                "Invalid status. Valid values: SCHEDULED, COMPLETED, CANCELLED.");
                         }
                 }
 
                 appointmentRepository.save(appointment);
 
                 AppointmentDetailProjection proj = appointmentRepository
-                                .buscarConsultaDetalhada(appointment.getAppointmentId());
+                                .findDetailedAppointment(appointment.getAppointmentId());
                 if (proj == null) {
-                        throw new RuntimeException("Falha ao recuperar appointment detalhada após atualização.");
+                        throw new RuntimeException("Failed to retrieve detailed appointment after update.");
                 }
 
                 java.sql.Date sqlDate = proj.getAppointmentDate();
-                java.sql.Time sqlHi = proj.getStartTime();
-                java.sql.Time sqlHf = proj.getEndTime();
+                java.sql.Time sqlStartTime = proj.getStartTime();
+                java.sql.Time sqlEndTime = proj.getEndTime();
 
-                LocalDate dataConsulta = sqlDate != null ? sqlDate.toLocalDate() : null;
-                LocalTime horaInicio = sqlHi != null ? sqlHi.toLocalTime() : null;
-                LocalTime horaFim = sqlHf != null ? sqlHf.toLocalTime() : null;
+                LocalDate appointmentDate = sqlDate != null ? sqlDate.toLocalDate() : null;
+                LocalTime startTime = sqlStartTime != null ? sqlStartTime.toLocalTime() : null;
+                LocalTime endTime = sqlEndTime != null ? sqlEndTime.toLocalTime() : null;
 
                 return new AppointmentDTO(
                                 proj.getId(),
-                                proj.getNome_paciente(),
-                                proj.getNome_medico(),
-                                dataConsulta,
-                                horaInicio,
-                                horaFim,
+                                proj.getPatientName(),
+                                proj.getDoctorName(),
+                                appointmentDate,
+                                startTime,
+                                endTime,
                                 proj.getStatus());
         }
 
         @Transactional
         public AppointmentDTO cancelAppointment(Integer appointmentId) {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new RuntimeException("Appointment não encontrada"));
+                                .orElseThrow(() -> new RuntimeException("Appointment not found"));
 
                 if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
-                        throw new RuntimeException("A appointment já está cancelada.");
+                        throw new RuntimeException("Appointment is already cancelled.");
                 }
 
                 appointment.setStatus(AppointmentStatus.CANCELLED);
                 appointmentRepository.save(appointment);
 
                 AppointmentDetailProjection proj = appointmentRepository
-                                .buscarConsultaDetalhada(appointment.getAppointmentId());
+                                .findDetailedAppointment(appointment.getAppointmentId());
                 if (proj == null) {
-                        throw new RuntimeException("Falha ao recuperar appointment detalhada após cancelamento.");
+                        throw new RuntimeException("Failed to retrieve detailed appointment after cancellation.");
                 }
 
                 java.sql.Date sqlDate = proj.getAppointmentDate();
-                java.sql.Time sqlHi = proj.getStartTime();
-                java.sql.Time sqlHf = proj.getEndTime();
+                java.sql.Time sqlStartTime = proj.getStartTime();
+                java.sql.Time sqlEndTime = proj.getEndTime();
 
-                LocalDate dataConsulta = sqlDate != null ? sqlDate.toLocalDate() : null;
-                LocalTime horaInicio = sqlHi != null ? sqlHi.toLocalTime() : null;
-                LocalTime horaFim = sqlHf != null ? sqlHf.toLocalTime() : null;
+                LocalDate appointmentDate = sqlDate != null ? sqlDate.toLocalDate() : null;
+                LocalTime startTime = sqlStartTime != null ? sqlStartTime.toLocalTime() : null;
+                LocalTime endTime = sqlEndTime != null ? sqlEndTime.toLocalTime() : null;
 
                 return new AppointmentDTO(
                                 proj.getId(),
-                                proj.getNome_paciente(),
-                                proj.getNome_medico(),
-                                dataConsulta,
-                                horaInicio,
-                                horaFim,
+                                proj.getPatientName(),
+                                proj.getDoctorName(),
+                                appointmentDate,
+                                startTime,
+                                endTime,
                                 proj.getStatus());
         }
 
         @Transactional
-        public List<AppointmentDTO> listarConsultasPorPaciente(Integer patientId) {
-                List<Appointment> consultas = appointmentRepository.findByPacienteId(patientId);
+        public List<AppointmentDTO> listAppointmentsByPatient(Integer patientId) {
+                List<Appointment> appointments = appointmentRepository.findByPacienteId(patientId);
 
-                if (consultas.isEmpty()) {
+                if (appointments.isEmpty()) {
                         return Collections.emptyList();
                 }
 
-                return consultas.stream().map(c -> {
-                        String nomePaciente = null;
+                return appointments.stream().map(c -> {
+                        String patientName = null;
                         if (c.getPatient() != null) {
-                                nomePaciente = c.getPatient().getName();
+                                patientName = c.getPatient().getName();
                         }
 
-                        String nomeMedico = null;
+                        String doctorName = null;
                         if (c.getDoctorId() != null) {
-                                nomeMedico = medicoRepository.findById(c.getDoctorId())
+                                doctorName = doctorRepository.findById(c.getDoctorId())
                                                 .map(Doctor::getName)
                                                 .orElse(null);
                         }
 
                         return new AppointmentDTO(
                                         c.getAppointmentId(),
-                                        nomePaciente,
-                                        nomeMedico,
+                                        patientName,
+                                        doctorName,
                                         c.getAppointmentDate(),
                                         c.getStartTime(),
                                         c.getEndTime(),
@@ -221,13 +221,13 @@ public class AppointmentService {
         }
 
         @Transactional
-        public List<AppointmentDTO> listarConsultasPorMedico(Integer doctorId) {
-                List<Map<String, Object>> consultas = appointmentRepository.buscarConsultasPorMedico(doctorId);
+        public List<AppointmentDTO> listAppointmentsByDoctor(Integer doctorId) {
+                List<Map<String, Object>> appointments = appointmentRepository.findAppointmentsByDoctor(doctorId);
 
-                return consultas.stream().map(c -> new AppointmentDTO(
+                return appointments.stream().map(c -> new AppointmentDTO(
                                 (Integer) c.get("id"),
-                                (String) c.get("nome_paciente"),
-                                (String) c.get("nome_medico"),
+                                (String) c.get("patientName"),
+                                (String) c.get("doctorName"),
                                 ((java.sql.Date) c.get("appointmentDate")).toLocalDate(),
                                 ((java.sql.Time) c.get("startTime")).toLocalTime(),
                                 ((java.sql.Time) c.get("endTime")).toLocalTime(),
@@ -235,13 +235,13 @@ public class AppointmentService {
         }
 
         @Transactional
-        public List<AppointmentDTO> listarConsultasPorData(LocalDate data) {
-                List<Map<String, Object>> consultas = appointmentRepository.buscarConsultasPorData(data);
+        public List<AppointmentDTO> listAppointmentsByDate(LocalDate date) {
+                List<Map<String, Object>> appointments = appointmentRepository.findAppointmentsByDate(date);
 
-                return consultas.stream().map(c -> new AppointmentDTO(
+                return appointments.stream().map(c -> new AppointmentDTO(
                                 (Integer) c.get("id"),
-                                (String) c.get("nome_paciente"),
-                                (String) c.get("nome_medico"),
+                                (String) c.get("patientName"),
+                                (String) c.get("doctorName"),
                                 ((java.sql.Date) c.get("appointmentDate")).toLocalDate(),
                                 ((java.sql.Time) c.get("startTime")).toLocalTime(),
                                 ((java.sql.Time) c.get("endTime")).toLocalTime(),

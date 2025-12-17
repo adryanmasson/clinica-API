@@ -4,34 +4,34 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class UpdateAppointmentDTO {
-    private LocalDate dataConsulta;
-    private LocalTime horaInicio;
-    private LocalTime horaFim;
-    private String status; // AGENDADA, REALIZADA, CANCELADA
+    private LocalDate appointmentDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String status; // SCHEDULED, COMPLETED, CANCELLED
 
-    // getters e setters
-    public LocalDate getDataConsulta() {
-        return dataConsulta;
+    // getters and setters
+    public LocalDate getAppointmentDate() {
+        return appointmentDate;
     }
 
-    public void setDataConsulta(LocalDate dataConsulta) {
-        this.dataConsulta = dataConsulta;
+    public void setAppointmentDate(LocalDate appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
 
-    public LocalTime getHoraInicio() {
-        return horaInicio;
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
-    public void setHoraInicio(LocalTime horaInicio) {
-        this.horaInicio = horaInicio;
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
     }
 
-    public LocalTime getHoraFim() {
-        return horaFim;
+    public LocalTime getEndTime() {
+        return endTime;
     }
 
-    public void setHoraFim(LocalTime horaFim) {
-        this.horaFim = horaFim;
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
     public String getStatus() {

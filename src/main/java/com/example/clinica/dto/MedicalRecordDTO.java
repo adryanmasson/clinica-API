@@ -102,7 +102,8 @@ public class MedicalRecordDTO {
 
                 Integer recordId = m.get("recordId") != null ? ((Number) m.get("recordId")).intValue()
                                 : null;
-                Integer appointmentId = m.get("appointmentId") != null ? ((Number) m.get("appointmentId")).intValue() : null;
+                Integer appointmentId = m.get("appointmentId") != null ? ((Number) m.get("appointmentId")).intValue()
+                                : null;
                 String patientName = (String) m.get("patientName");
                 String doctorName = (String) m.get("doctorName");
                 String anamnesis = (String) m.get("anamnesis");
@@ -126,22 +127,23 @@ public class MedicalRecordDTO {
                                 recordDate);
         }
 
-        public static MedicalRecordDTO fromEntity(MedicalRecord prontuario) {
-                if (prontuario == null)
+        public static MedicalRecordDTO fromEntity(MedicalRecord medicalRecord) {
+                if (medicalRecord == null)
                         return null;
 
                 return new MedicalRecordDTO(
-                                prontuario.getRecordId(),
-                                prontuario.getAppointment() != null ? prontuario.getAppointment().getAppointmentId() : null,
-                                prontuario.getAppointment() != null && prontuario.getAppointment().getPatient() != null
-                                                ? prontuario.getAppointment().getPatient().getName()
+                                medicalRecord.getRecordId(),
+                                medicalRecord.getAppointment() != null ? medicalRecord.getAppointment().getAppointmentId()
                                                 : null,
-                                prontuario.getAppointment() != null && prontuario.getAppointment().getDoctor() != null
-                                                ? prontuario.getAppointment().getDoctor().getName()
+                                medicalRecord.getAppointment() != null && medicalRecord.getAppointment().getPatient() != null
+                                                ? medicalRecord.getAppointment().getPatient().getName()
                                                 : null,
-                                prontuario.getAnamnesis(),
-                                prontuario.getDiagnosis(),
-                                prontuario.getPrescription(),
-                                prontuario.getRecordDate());
+                                medicalRecord.getAppointment() != null && medicalRecord.getAppointment().getDoctor() != null
+                                                ? medicalRecord.getAppointment().getDoctor().getName()
+                                                : null,
+                                medicalRecord.getAnamnesis(),
+                                medicalRecord.getDiagnosis(),
+                                medicalRecord.getPrescription(),
+                                medicalRecord.getRecordDate());
         }
 }

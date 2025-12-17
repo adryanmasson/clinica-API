@@ -22,12 +22,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
   boolean existsByFkIdMedicoAndStatus(Integer doctorId, AppointmentStatus status);
 
   @Procedure(name = "Appointment.criar_consulta")
-  void criarConsulta(
+  void createAppointment(
       @Param("patientId") Integer patientId,
       @Param("doctorId") Integer doctorId,
       @Param("appointmentDate") java.time.LocalDate data,
-      @Param("startTime") java.time.LocalTime horaInicio,
-      @Param("endTime") java.time.LocalTime horaFim);
+      @Param("startTime") java.time.LocalTime startTime,
+      @Param("endTime") java.time.LocalTime endTime);
 
   @Query(value = "SELECT TOP 1 * FROM appointments " +
       "WHERE patient_id = :patientId " +
@@ -56,28 +56,28 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
       @Param("excludeId") Integer excludeId);
 
   @Query(value = "SELECT c.appointment_id AS id, c.appointment_date, c.start_time, c.end_time, c.status, " +
-      "p.name AS nome_paciente, m.name AS nome_medico " +
+      "p.name AS patientName, m.name AS doctorName " +
       "FROM appointments c " +
       "INNER JOIN patients p ON p.patient_id = c.patient_id " +
       "INNER JOIN doctors m ON m.doctor_id = c.doctor_id " +
       "WHERE c.appointment_id = :id", nativeQuery = true)
-  AppointmentDetailProjection buscarConsultaDetalhada(@Param("id") Integer id);
+  AppointmentDetailProjection findDetailedAppointment(@Param("id") Integer id);
 
   @Query(value = "SELECT c.appointment_id AS id, c.appointment_date, c.start_time, c.end_time, c.status, " +
-      "p.name AS nome_paciente, m.name AS nome_medico " +
+      "p.name AS patientName, m.name AS doctorName " +
       "FROM appointments c " +
       "INNER JOIN patients p ON p.patient_id = c.patient_id " +
       "INNER JOIN doctors m ON m.doctor_id = c.doctor_id " +
       "WHERE c.doctor_id = :doctorId", nativeQuery = true)
-  List<Map<String, Object>> buscarConsultasPorMedico(@Param("doctorId") Integer doctorId);
+  List<Map<String, Object>> findAppointmentsByDoctor(@Param("doctorId") Integer doctorId);
 
   @Query(value = "SELECT c.appointment_id AS id, c.appointment_date, c.start_time, c.end_time, c.status, " +
-      "p.name AS nome_paciente, m.name AS nome_medico " +
+      "p.name AS patientName, m.name AS doctorName " +
       "FROM appointments c " +
       "INNER JOIN patients p ON p.patient_id = c.patient_id " +
       "INNER JOIN doctors m ON m.doctor_id = c.doctor_id " +
       "WHERE c.appointment_date = :data", nativeQuery = true)
-  List<Map<String, Object>> buscarConsultasPorData(@Param("data") LocalDate data);
+  List<Map<String, Object>> findAppointmentsByDate(@Param("data") LocalDate data);
 
   @Query(value = """
       SELECT
@@ -102,12 +102,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
   @Query(value = """
       SELECT
           c.appointment_id AS appointmentId,
-          c.appointment_date AS dataConsulta,
-          c.start_time AS horaInicio,
-          c.end_time AS horaFim,
+          c.appointment_date AS appointmentDate,
+          c.start_time AS startTime,
+          c.end_time AS endTime,
           c.status AS status,
-          m.name AS nomeMedico,
-          p.name AS nomePaciente
+          m.name AS doctorName,
+          p.name AS patientName
       FROM appointments c
       INNER JOIN doctors m ON m.doctor_id = c.doctor_id
       INNER JOIN patients p ON p.patient_id = c.patient_id
@@ -119,12 +119,12 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
   @Query(value = """
       SELECT TOP 50
           c.appointment_id AS appointmentId,
-          c.appointment_date AS dataConsulta,
-          c.start_time AS horaInicio,
-          c.end_time AS horaFim,
+          c.appointment_date AS appointmentDate,
+          c.start_time AS startTime,
+          c.end_time AS endTime,
           c.status AS status,
-          p.name AS nomePaciente,
-          m.name AS nomeMedico
+          p.name AS patientName,
+          m.name AS doctorName
       FROM appointments c
       INNER JOIN patients p ON p.patient_id = c.patient_id
       INNER JOIN doctors m ON m.doctor_id = c.doctor_id
@@ -135,8 +135,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Intege
       """, nativeQuery = true)
   List<Map<String, Object>> upcomingAppointmentsReport(@Param("doctorId") Integer doctorId);
 
-  @Query("SELECT c FROM Appointment c WHERE c.doctorId = :doctorId AND c.appointmentDate = :data")
-  List<Appointment> findByMedicoIdAndDataConsulta(@Param("doctorId") Integer doctorId,
-      @Param("data") LocalDate data);
+  @Query("SELECT c FROM Appointment c WHERE c.doctorId = :doctorId AND c.appointmentDate = :date")
+  List<Appointment> findByDoctorIdAndAppointmentDate(@Param("doctorId") Integer doctorId,
+      @Param("date") LocalDate date);
 
 }

@@ -6,57 +6,57 @@ import java.time.LocalTime;
 public class PatientHistoryDTO {
 
     private Integer appointmentId;
-    private LocalDate dataConsulta;
-    private LocalTime horaInicio;
-    private LocalTime horaFim;
-    private String statusConsulta;
+    private LocalDate appointmentDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
+    private String appointmentStatus;
     private Integer recordId;
     private String anamnesis;
     private String diagnosis;
     private String prescription;
-    private String nomeMedico;
+    private String doctorName;
 
     public PatientHistoryDTO() {
     }
 
-    public Integer getIdConsulta() {
+    public Integer getAppointmentId() {
         return appointmentId;
     }
 
-    public void setIdConsulta(Integer appointmentId) {
+    public void setAppointmentId(Integer appointmentId) {
         this.appointmentId = appointmentId;
     }
 
-    public LocalDate getDataConsulta() {
-        return dataConsulta;
+    public LocalDate getAppointmentDate() {
+        return appointmentDate;
     }
 
-    public void setDataConsulta(LocalDate dataConsulta) {
-        this.dataConsulta = dataConsulta;
+    public void setAppointmentDate(LocalDate appointmentDate) {
+        this.appointmentDate = appointmentDate;
     }
 
-    public LocalTime getHoraInicio() {
-        return horaInicio;
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
-    public void setHoraInicio(LocalTime horaInicio) {
-        this.horaInicio = horaInicio;
+    public void setStartTime(LocalTime startTime) {
+        this.startTime = startTime;
     }
 
-    public LocalTime getHoraFim() {
-        return horaFim;
+    public LocalTime getEndTime() {
+        return endTime;
     }
 
-    public void setHoraFim(LocalTime horaFim) {
-        this.horaFim = horaFim;
+    public void setEndTime(LocalTime endTime) {
+        this.endTime = endTime;
     }
 
-    public String getStatusConsulta() {
-        return statusConsulta;
+    public String getAppointmentStatus() {
+        return appointmentStatus;
     }
 
-    public void setStatusConsulta(String statusConsulta) {
-        this.statusConsulta = statusConsulta;
+    public void setAppointmentStatus(String appointmentStatus) {
+        this.appointmentStatus = appointmentStatus;
     }
 
     public Integer getRecordId() {
@@ -91,11 +91,11 @@ public class PatientHistoryDTO {
         this.prescription = prescription;
     }
 
-    public String getNomeMedico() {
-        return nomeMedico;
+    public String getDoctorName() {
+        return doctorName;
     }
 
-    public void setNomeMedico(String nomeMedico) {
-        this.nomeMedico = nomeMedico;
+    public void setDoctorName(String doctorName) {
+        this.doctorName = doctorName;
     }
 }

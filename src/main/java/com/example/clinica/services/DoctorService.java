@@ -21,161 +21,162 @@ import java.util.stream.Collectors;
 @Service
 public class DoctorService {
 
-    private final DoctorRepository medicoRepository;
-    private final SpecialtyRepository especialidadeRepository;
+    private final DoctorRepository doctorRepository;
+    private final SpecialtyRepository specialtyRepository;
     private final AppointmentRepository appointmentRepository;
 
-    public DoctorService(DoctorRepository medicoRepository, SpecialtyRepository especialidadeRepository,
+    public DoctorService(DoctorRepository doctorRepository, SpecialtyRepository specialtyRepository,
             AppointmentRepository appointmentRepository) {
-        this.medicoRepository = medicoRepository;
-        this.especialidadeRepository = especialidadeRepository;
+        this.doctorRepository = doctorRepository;
+        this.specialtyRepository = specialtyRepository;
         this.appointmentRepository = appointmentRepository;
     }
 
     public List<Doctor> listDoctors() {
-        return medicoRepository.findAll();
+        return doctorRepository.findAll();
     }
 
     public Doctor findDoctorById(Integer id) {
-        return medicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
+        return doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
     }
 
     @Transactional
     public Doctor createDoctor(Doctor doctor) {
-        if (medicoRepository.existsByCrm(doctor.getMedicalLicense())) {
-            throw new RuntimeException("CRM já cadastrado para outro médico.");
+        if (doctorRepository.existsByCrm(doctor.getMedicalLicense())) {
+            throw new RuntimeException("Medical license already registered for another doctor.");
         }
 
-        Integer especialidadeId = doctor.getSpecialty().getSpecialtyId();
+        Integer specialtyId = doctor.getSpecialty().getSpecialtyId();
 
-        Specialty specialty = especialidadeRepository.findById(especialidadeId)
-                .orElseThrow(() -> new RuntimeException("Specialty não encontrada."));
+        Specialty specialty = specialtyRepository.findById(specialtyId)
+                .orElseThrow(() -> new RuntimeException("Specialty not found."));
 
         doctor.setSpecialty(specialty);
 
-        return medicoRepository.save(doctor);
+        return doctorRepository.save(doctor);
     }
 
     @Transactional
-    public Doctor updateDoctor(Integer id, Doctor medicoAtualizado) {
-        Doctor medicoExistente = medicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
+    public Doctor updateDoctor(Integer id, Doctor updatedDoctor) {
+        Doctor existingDoctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        if (!medicoExistente.getMedicalLicense().equals(medicoAtualizado.getMedicalLicense()) &&
-                medicoRepository.existsByCrm(medicoAtualizado.getMedicalLicense())) {
-            throw new RuntimeException("CRM já cadastrado para outro médico.");
+        if (!existingDoctor.getMedicalLicense().equals(updatedDoctor.getMedicalLicense()) &&
+                doctorRepository.existsByCrm(updatedDoctor.getMedicalLicense())) {
+            throw new RuntimeException("Medical license already registered for another doctor.");
         }
 
-        if (medicoAtualizado.getSpecialty() != null) {
-            Specialty specialty = especialidadeRepository.findById(
-                    medicoAtualizado.getSpecialty().getSpecialtyId())
-                    .orElseThrow(() -> new RuntimeException("Specialty não encontrada."));
+        if (updatedDoctor.getSpecialty() != null) {
+            Specialty specialty = specialtyRepository.findById(
+                    updatedDoctor.getSpecialty().getSpecialtyId())
+                    .orElseThrow(() -> new RuntimeException("Specialty not found."));
 
-            medicoExistente.setSpecialty(specialty);
+            existingDoctor.setSpecialty(specialty);
         }
 
-        medicoExistente.setName(medicoAtualizado.getName());
-        medicoExistente.setMedicalLicense(medicoAtualizado.getMedicalLicense());
-        medicoExistente.setBirthDate(medicoAtualizado.getBirthDate());
-        medicoExistente.setPhone(medicoAtualizado.getPhone());
-        medicoExistente.setActive(medicoAtualizado.getActive());
+        existingDoctor.setName(updatedDoctor.getName());
+        existingDoctor.setMedicalLicense(updatedDoctor.getMedicalLicense());
+        existingDoctor.setBirthDate(updatedDoctor.getBirthDate());
+        existingDoctor.setPhone(updatedDoctor.getPhone());
+        existingDoctor.setActive(updatedDoctor.getActive());
 
-        return medicoRepository.save(medicoExistente);
+        return doctorRepository.save(existingDoctor);
     }
 
     @Transactional
     public void deleteDoctor(Integer id) {
-        Doctor doctor = medicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Médico não encontrado"));
+        Doctor doctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Doctor not found"));
 
-        boolean temConsultasAgendadas = appointmentRepository.existsByFkIdMedicoAndStatus(id, AppointmentStatus.SCHEDULED);
+        boolean hasScheduledAppointments = appointmentRepository.existsByFkIdMedicoAndStatus(id,
+                AppointmentStatus.SCHEDULED);
 
-        if (temConsultasAgendadas) {
-            throw new RuntimeException("Não é possível excluir o médico, pois ele possui consultas agendadas.");
+        if (hasScheduledAppointments) {
+            throw new RuntimeException("Cannot delete doctor because he has scheduled appointments.");
         }
 
-        medicoRepository.delete(doctor);
+        doctorRepository.delete(doctor);
     }
 
     public List<Doctor> listBySpecialty(Integer specialtyId) {
-        return medicoRepository.findByEspecialidadeIdEspecialidade(specialtyId);
+        return doctorRepository.findByEspecialidadeIdEspecialidade(specialtyId);
     }
 
     @Transactional(readOnly = true)
     public List<AppointmentDTO> appointmentReportByDoctor(Integer doctorId) {
-        List<Map<String, Object>> consultas = appointmentRepository.appointmentReportByDoctor(doctorId);
+        List<Map<String, Object>> appointments = appointmentRepository.appointmentReportByDoctor(doctorId);
 
-        return consultas.stream().map(c -> {
+        return appointments.stream().map(c -> {
             AppointmentDTO dto = new AppointmentDTO();
             dto.setId((Integer) c.get("appointmentId"));
-            dto.setAppointmentDate(((java.sql.Date) c.get("dataConsulta")).toLocalDate());
-            dto.setStartTime(((java.sql.Time) c.get("horaInicio")).toLocalTime());
-            dto.setEndTime(((java.sql.Time) c.get("horaFim")).toLocalTime());
+            dto.setAppointmentDate(((java.sql.Date) c.get("appointmentDate")).toLocalDate());
+            dto.setStartTime(((java.sql.Time) c.get("startTime")).toLocalTime());
+            dto.setEndTime(((java.sql.Time) c.get("endTime")).toLocalTime());
             dto.setStatus((String) c.get("status"));
-            dto.setDoctorName((String) c.get("nomeMedico"));
-            dto.setPatientName((String) c.get("nomePaciente"));
+            dto.setDoctorName((String) c.get("doctorName"));
+            dto.setPatientName((String) c.get("patientName"));
             return dto;
         }).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<AppointmentDTO> upcomingAppointmentsReport(Integer doctorId) {
-        List<Map<String, Object>> consultas = appointmentRepository.upcomingAppointmentsReport(doctorId);
+        List<Map<String, Object>> appointments = appointmentRepository.upcomingAppointmentsReport(doctorId);
 
-        return consultas.stream().map(c -> {
+        return appointments.stream().map(c -> {
             AppointmentDTO dto = new AppointmentDTO();
             dto.setId((Integer) c.get("appointmentId"));
-            dto.setAppointmentDate(((java.sql.Date) c.get("dataConsulta")).toLocalDate());
-            dto.setStartTime(((java.sql.Time) c.get("horaInicio")).toLocalTime());
-            dto.setEndTime(((java.sql.Time) c.get("horaFim")).toLocalTime());
+            dto.setAppointmentDate(((java.sql.Date) c.get("appointmentDate")).toLocalDate());
+            dto.setStartTime(((java.sql.Time) c.get("startTime")).toLocalTime());
+            dto.setEndTime(((java.sql.Time) c.get("endTime")).toLocalTime());
             dto.setStatus((String) c.get("status"));
-            dto.setDoctorName((String) c.get("nomeMedico"));
-            dto.setPatientName((String) c.get("nomePaciente"));
+            dto.setDoctorName((String) c.get("doctorName"));
+            dto.setPatientName((String) c.get("patientName"));
             return dto;
         }).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<Map<String, LocalTime>> findAvailableTimeSlots(Integer doctorId, LocalDate data) {
-        List<Appointment> consultas = appointmentRepository.findByMedicoIdAndDataConsulta(doctorId, data);
+    public List<Map<String, LocalTime>> findAvailableTimeSlots(Integer doctorId, LocalDate date) {
+        List<Appointment> appointments = appointmentRepository.findByDoctorIdAndAppointmentDate(doctorId, date);
 
-        LocalTime horaAtual = LocalTime.of(8, 0);
-        LocalTime horaFinal = LocalTime.of(18, 0);
+        LocalTime startTime = LocalTime.of(8, 0);
+        LocalTime endTime = LocalTime.of(18, 0);
 
-        List<Map<String, LocalTime>> horariosDisponiveis = new ArrayList<>();
-        LocalTime blocoInicio = null;
+        List<Map<String, LocalTime>> availableSlots = new ArrayList<>();
+        LocalTime blockStart = null;
 
-        while (horaAtual.isBefore(horaFinal)) {
-            LocalTime slotInicio = horaAtual;
-            LocalTime slotFim = slotInicio.plusMinutes(30);
+        while (startTime.isBefore(endTime)) {
+            LocalTime slotStart = startTime;
+            LocalTime slotEnd = slotStart.plusMinutes(30);
 
-            boolean ocupado = consultas.stream()
-                    .anyMatch(c -> slotInicio.isBefore(c.getEndTime()) && slotFim.isAfter(c.getStartTime()));
+            boolean booked = appointments.stream()
+                    .anyMatch(c -> slotStart.isBefore(c.getEndTime()) && slotEnd.isAfter(c.getStartTime()));
 
-            if (!ocupado) {
-                if (blocoInicio == null) {
-                    blocoInicio = slotInicio;
+            if (!booked) {
+                if (blockStart == null) {
+                    blockStart = slotStart;
                 }
             } else {
-                if (blocoInicio != null) {
-                    horariosDisponiveis.add(Map.of(
-                            "horaInicio", blocoInicio,
-                            "horaFim", slotInicio));
-                    blocoInicio = null;
+                if (blockStart != null) {
+                    availableSlots.add(Map.of(
+                            "startTime", blockStart,
+                            "endTime", slotStart));
+                    blockStart = null;
                 }
             }
 
-            horaAtual = slotFim;
+            startTime = slotEnd;
         }
 
-        if (blocoInicio != null) {
-            horariosDisponiveis.add(Map.of(
-                    "horaInicio", blocoInicio,
-                    "horaFim", horaFinal));
+        if (blockStart != null) {
+            availableSlots.add(Map.of(
+                    "startTime", blockStart,
+                    "endTime", endTime));
         }
 
-        return horariosDisponiveis;
+        return availableSlots;
     }
 
 }

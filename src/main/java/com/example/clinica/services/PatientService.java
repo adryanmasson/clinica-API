@@ -34,9 +34,9 @@ public class PatientService {
     }
 
     public Patient createPatient(Patient patient) {
-        Optional<Patient> pacienteExistente = patientRepository.findByCpf(patient.getCpf());
-        if (pacienteExistente.isPresent()) {
-            throw new RuntimeException("Já existe patient com esse CPF: " + patient.getCpf());
+        Optional<Patient> existingPatient = patientRepository.findByCpf(patient.getCpf());
+        if (existingPatient.isPresent()) {
+            throw new RuntimeException("Patient already exists with this CPF: " + patient.getCpf());
         }
         return patientRepository.save(patient);
     }
@@ -59,11 +59,11 @@ public class PatientService {
 
     public void deletePatient(Integer id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient não encontrado."));
+                .orElseThrow(() -> new RuntimeException("Patient not found."));
 
-        List<Appointment> consultas = appointmentRepository.findByPacienteId(id);
-        if (!consultas.isEmpty()) {
-            throw new RuntimeException("Patient possui consultas associadas e não pode ser excluído.");
+        List<Appointment> appointments = appointmentRepository.findByPacienteId(id);
+        if (!appointments.isEmpty()) {
+            throw new RuntimeException("Patient has associated appointments and cannot be deleted.");
         }
 
         patientRepository.delete(patient);
@@ -75,37 +75,37 @@ public class PatientService {
 
     @Transactional
     public List<PatientHistoryDTO> listPatientHistory(Integer patientId) {
-        List<Map<String, Object>> historico = patientRepository.listPatientHistory(patientId);
+        List<Map<String, Object>> history = patientRepository.listPatientHistory(patientId);
 
-        return historico.stream().map(h -> {
+        return history.stream().map(h -> {
             PatientHistoryDTO dto = new PatientHistoryDTO();
-            dto.setIdConsulta((Integer) h.get("appointmentId"));
-            dto.setDataConsulta(((java.sql.Date) h.get("dataConsulta")).toLocalDate());
-            dto.setHoraInicio(((java.sql.Time) h.get("horaInicio")).toLocalTime());
-            dto.setHoraFim(((java.sql.Time) h.get("horaFim")).toLocalTime());
-            dto.setStatusConsulta((String) h.get("status"));
+            dto.setAppointmentId((Integer) h.get("appointmentId"));
+            dto.setAppointmentDate(((java.sql.Date) h.get("appointmentDate")).toLocalDate());
+            dto.setStartTime(((java.sql.Time) h.get("startTime")).toLocalTime());
+            dto.setEndTime(((java.sql.Time) h.get("endTime")).toLocalTime());
+            dto.setAppointmentStatus((String) h.get("status"));
             dto.setRecordId((Integer) h.get("recordId"));
             dto.setAnamnesis((String) h.get("anamnesis"));
             dto.setDiagnosis((String) h.get("diagnosis"));
             dto.setPrescription((String) h.get("prescription"));
-            dto.setNomeMedico((String) h.get("nomeMedico"));
+            dto.setDoctorName((String) h.get("doctorName"));
             return dto;
         }).collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDTO> appointmentsReportLastMonths(Integer patientId, Integer meses) {
-        List<Map<String, Object>> consultas = appointmentRepository.appointmentsReportLastMonths(patientId, meses);
+    public List<AppointmentDTO> appointmentsReportLastMonths(Integer patientId, Integer months) {
+        List<Map<String, Object>> appointments = appointmentRepository.appointmentsReportLastMonths(patientId, months);
 
-        return consultas.stream().map(c -> {
+        return appointments.stream().map(c -> {
             AppointmentDTO dto = new AppointmentDTO();
             dto.setId((Integer) c.get("appointmentId"));
-            dto.setAppointmentDate(((java.sql.Date) c.get("dataConsulta")).toLocalDate());
-            dto.setStartTime(((java.sql.Time) c.get("horaInicio")).toLocalTime());
-            dto.setEndTime(((java.sql.Time) c.get("horaFim")).toLocalTime());
+            dto.setAppointmentDate(((java.sql.Date) c.get("appointmentDate")).toLocalDate());
+            dto.setStartTime(((java.sql.Time) c.get("startTime")).toLocalTime());
+            dto.setEndTime(((java.sql.Time) c.get("endTime")).toLocalTime());
             dto.setStatus((String) c.get("status"));
-            dto.setDoctorName((String) c.get("nomeMedico"));
-            dto.setPatientName((String) c.get("nomePaciente"));
+            dto.setDoctorName((String) c.get("doctorName"));
+            dto.setPatientName((String) c.get("patientName"));
             return dto;
         }).collect(Collectors.toList());
 

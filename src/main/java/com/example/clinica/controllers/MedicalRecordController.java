@@ -58,9 +58,9 @@ public class MedicalRecordController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> excluirProntuario(@PathVariable Integer id) {
-        boolean excluido = prontuarioService.excluirProntuario(id);
-        if (excluido) {
+    public ResponseEntity<ApiResponse<String>> deleteMedicalRecord(@PathVariable Integer id) {
+        boolean deleted = prontuarioService.deleteMedicalRecord(id);
+        if (deleted) {
             return ResponseEntity.ok(ApiResponse.success("Medical record deleted successfully.", null));
         } else {
             return ResponseEntity.status(404).body(ApiResponse.error("Medical record not found."));

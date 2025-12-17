@@ -23,20 +23,21 @@ public class MedicalRecordService {
     private final MedicalRecordRepository medicalRecordRepository;
     private final AppointmentRepository appointmentRepository;
 
-    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository, AppointmentRepository appointmentRepository) {
+    public MedicalRecordService(MedicalRecordRepository medicalRecordRepository,
+            AppointmentRepository appointmentRepository) {
         this.medicalRecordRepository = medicalRecordRepository;
         this.appointmentRepository = appointmentRepository;
     }
 
     @Transactional
     public List<MedicalRecordDTO> listMedicalRecords() {
-        List<Map<String, Object>> prontuarios = medicalRecordRepository.listMedicalRecords();
-        return prontuarios.stream().map(MedicalRecordDTO::fromMap).collect(Collectors.toList());
+        List<Map<String, Object>> medicalRecords = medicalRecordRepository.listMedicalRecords();
+        return medicalRecords.stream().map(MedicalRecordDTO::fromMap).collect(Collectors.toList());
     }
 
     @Transactional
     public MedicalRecordDTO findByAppointment(Integer appointmentId) {
-        Map<String, Object> m = medicalRecordRepository.findDetalhadoByConsultaId(appointmentId);
+        Map<String, Object> m = medicalRecordRepository.findDetailedByAppointmentId(appointmentId);
         return MedicalRecordDTO.fromMap(m);
     }
 
@@ -44,54 +45,54 @@ public class MedicalRecordService {
     public MedicalRecordDTO createMedicalRecord(CreateMedicalRecordDTO dto) {
         Integer appointmentId = dto.getAppointmentId();
         if (appointmentId == null) {
-            throw new RuntimeException("appointmentId é obrigatório.");
+            throw new RuntimeException("appointmentId is required.");
         }
 
-        MedicalRecord existente = medicalRecordRepository.findByConsultaId(appointmentId);
-        if (existente != null) {
-            throw new RuntimeException("Já existe prontuário para essa appointment.");
+        MedicalRecord existing = medicalRecordRepository.findByAppointmentId(appointmentId);
+        if (existing != null) {
+            throw new RuntimeException("Medical record already exists for this appointment.");
         }
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new RuntimeException("Appointment não encontrada."));
+                .orElseThrow(() -> new RuntimeException("Appointment not found."));
 
-        MedicalRecord prontuario = new MedicalRecord();
-        prontuario.setAppointment(appointment);
-        prontuario.setAnamnesis(dto.getAnamnesis());
-        prontuario.setDiagnosis(dto.getDiagnosis());
-        prontuario.setPrescription(dto.getPrescription());
-        prontuario.setRecordDate(LocalDate.now());
+        MedicalRecord medicalRecord = new MedicalRecord();
+        medicalRecord.setAppointment(appointment);
+        medicalRecord.setAnamnesis(dto.getAnamnesis());
+        medicalRecord.setDiagnosis(dto.getDiagnosis());
+        medicalRecord.setPrescription(dto.getPrescription());
+        medicalRecord.setRecordDate(LocalDate.now());
 
-        medicalRecordRepository.save(prontuario);
+        medicalRecordRepository.save(medicalRecord);
 
-        Map<String, Object> detalhado = medicalRecordRepository.findDetalhadoByConsultaId(appointmentId);
-        return MedicalRecordDTO.fromMap(detalhado);
+        Map<String, Object> detailed = medicalRecordRepository.findDetailedByAppointmentId(appointmentId);
+        return MedicalRecordDTO.fromMap(detailed);
     }
 
     @Transactional
-    public MedicalRecordDTO updateMedicalRecord(Integer id, UpdateMedicalRecordDTO dados) {
-        Optional<MedicalRecord> optionalProntuario = medicalRecordRepository.findById(id);
+    public MedicalRecordDTO updateMedicalRecord(Integer id, UpdateMedicalRecordDTO data) {
+        Optional<MedicalRecord> optionalMedicalRecord = medicalRecordRepository.findById(id);
 
-        if (optionalProntuario.isEmpty()) {
+        if (optionalMedicalRecord.isEmpty()) {
             return null;
         }
 
-        MedicalRecord prontuario = optionalProntuario.get();
+        MedicalRecord medicalRecord = optionalMedicalRecord.get();
 
-        if (dados.getAnamnesis() != null)
-            prontuario.setAnamnesis(dados.getAnamnesis());
-        if (dados.getDiagnosis() != null)
-            prontuario.setDiagnosis(dados.getDiagnosis());
-        if (dados.getPrescription() != null)
-            prontuario.setPrescription(dados.getPrescription());
+        if (data.getAnamnesis() != null)
+            medicalRecord.setAnamnesis(data.getAnamnesis());
+        if (data.getDiagnosis() != null)
+            medicalRecord.setDiagnosis(data.getDiagnosis());
+        if (data.getPrescription() != null)
+            medicalRecord.setPrescription(data.getPrescription());
 
-        medicalRecordRepository.save(prontuario);
+        medicalRecordRepository.save(medicalRecord);
 
-        return MedicalRecordDTO.fromEntity(prontuario);
+        return MedicalRecordDTO.fromEntity(medicalRecord);
     }
 
     @Transactional
-    public boolean excluirProntuario(Integer recordId) {
+    public boolean deleteMedicalRecord(Integer recordId) {
         if (medicalRecordRepository.existsById(recordId)) {
             medicalRecordRepository.deleteById(recordId);
             return true;

@@ -14,12 +14,12 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, In
 
         @Query(value = "SELECT p.record_id AS recordId, " +
                         "p.appointment_id AS appointmentId, " +
-                        "pac.name AS nomePaciente, " +
-                        "m.name AS nomeMedico, " +
+                        "pac.name AS patientName, " +
+                        "m.name AS doctorName, " +
                         "p.anamnesis AS anamnesis, " +
                         "p.diagnosis AS diagnosis, " +
                         "p.prescription AS prescription, " +
-                        "p.record_date AS data_registro " +
+                        "p.record_date AS recordDate " +
                         "FROM medical_records p " +
                         "JOIN appointments c ON c.appointment_id = p.appointment_id " +
                         "JOIN patients pac ON pac.patient_id = c.patient_id " +
@@ -28,19 +28,19 @@ public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, In
 
         @Query(value = "SELECT p.record_id AS recordId, " +
                         "p.appointment_id AS appointmentId, " +
-                        "pac.name AS nomePaciente, " +
-                        "m.name AS nomeMedico, " +
+                        "pac.name AS patientName, " +
+                        "m.name AS doctorName, " +
                         "p.anamnesis AS anamnesis, " +
                         "p.diagnosis AS diagnosis, " +
                         "p.prescription AS prescription, " +
-                        "p.record_date AS data_registro " +
+                        "p.record_date AS recordDate " +
                         "FROM medical_records p " +
                         "JOIN appointments c ON c.appointment_id = p.appointment_id " +
                         "JOIN patients pac ON pac.patient_id = c.patient_id " +
                         "JOIN doctors m ON m.doctor_id = c.doctor_id " +
                         "WHERE p.appointment_id = :appointmentId", nativeQuery = true)
-        Map<String, Object> findDetalhadoByConsultaId(@Param("appointmentId") Integer appointmentId);
+        Map<String, Object> findDetailedByAppointmentId(@Param("appointmentId") Integer appointmentId);
 
         @Query("SELECT pr FROM MedicalRecord pr WHERE pr.appointment.appointmentId = :appointmentId")
-        MedicalRecord findByConsultaId(@Param("appointmentId") Integer appointmentId);
+        MedicalRecord findByAppointmentId(@Param("appointmentId") Integer appointmentId);
 }

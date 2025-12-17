@@ -14,7 +14,7 @@ public interface AppointmentDetailProjection {
 
     String getStatus();
 
-    String getNome_paciente();
+    String getPatientName();
 
-    String getNome_medico();
+    String getDoctorName();
 }
