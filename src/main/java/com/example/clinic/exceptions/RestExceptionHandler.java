@@ -51,8 +51,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     protected ResponseEntity<ApiResponse<Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
         Throwable cause = ex.getMostSpecificCause();
-        String msg = (cause != null && cause.getMessage() != null) ? cause.getMessage() : 
-                     (ex.getMessage() != null ? ex.getMessage() : "Integrity violation");
+        String msg = (cause != null && cause.getMessage() != null) ? cause.getMessage()
+                : (ex.getMessage() != null ? ex.getMessage() : "Integrity violation");
         ApiResponse<Object> body = ApiResponse.error("Integrity violation: " + msg);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }

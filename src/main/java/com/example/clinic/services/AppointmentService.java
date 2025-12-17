@@ -46,7 +46,7 @@ public class AppointmentService {
                                                 c.getStartTime(),
                                                 c.getEndTime(),
                                                 c.getStatus().name()))
-                                .collect(Collectors.toList());
+                                .toList();
         }
 
         public AppointmentDTO findAppointmentById(Integer id) {
@@ -84,7 +84,8 @@ public class AppointmentService {
 
                 Appointment appointment = appointmentRepository
                                 .findInserted(patientId, doctorId, appointmentDate, startTime, endTime)
-                                .orElseThrow(() -> new EntityNotFoundException("Failed to retrieve the created appointment."));
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                                "Failed to retrieve the created appointment."));
 
                 return new AppointmentDTO(
                                 appointment.getId(),
@@ -99,7 +100,7 @@ public class AppointmentService {
         @Transactional
         public AppointmentDTO updateAppointment(Integer appointmentId, UpdateAppointmentDTO dto) {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
+                                .orElseThrow(() -> new EntityNotFoundException("Appointment not found."));
 
                 if (dto.getAppointmentDate() != null || dto.getStartTime() != null || dto.getEndTime() != null) {
                         LocalDate newDate = dto.getAppointmentDate() != null ? dto.getAppointmentDate()
@@ -115,7 +116,8 @@ public class AppointmentService {
                                         .isEmpty();
 
                         if (conflict) {
-                                throw new AppointmentConflictException("Doctor already has an appointment scheduled at this time.");
+                                throw new AppointmentConflictException(
+                                                "Doctor already has an appointment scheduled at this time.");
                         }
 
                         appointment.setAppointmentDate(newDate);
@@ -161,7 +163,7 @@ public class AppointmentService {
         @Transactional
         public AppointmentDTO cancelAppointment(Integer appointmentId) {
                 Appointment appointment = appointmentRepository.findById(appointmentId)
-                                .orElseThrow(() -> new EntityNotFoundException("Appointment not found"));
+                                .orElseThrow(() -> new EntityNotFoundException("Appointment not found."));
 
                 if (appointment.getStatus() == AppointmentStatus.CANCELLED) {
                         throw new BusinessRuleException("Appointment is already cancelled.");
@@ -173,7 +175,8 @@ public class AppointmentService {
                 AppointmentDetailProjection proj = appointmentRepository
                                 .findDetailedAppointment(appointment.getAppointmentId());
                 if (proj == null) {
-                        throw new EntityNotFoundException("Failed to retrieve detailed appointment after cancellation.");
+                        throw new EntityNotFoundException(
+                                        "Failed to retrieve detailed appointment after cancellation.");
                 }
 
                 java.sql.Date sqlDate = proj.getAppointmentDate();
@@ -223,7 +226,7 @@ public class AppointmentService {
                                         c.getStartTime(),
                                         c.getEndTime(),
                                         c.getStatus() != null ? c.getStatus().name() : null);
-                }).collect(Collectors.toList());
+                }).toList();
         }
 
         @Transactional

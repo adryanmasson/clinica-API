@@ -28,11 +28,11 @@ public final class H2Functions {
     }
 
     public static void createAppointment(Connection conn,
-                                         Integer patientId,
-                                         Integer doctorId,
-                                         Date appointmentDate,
-                                         Time startTime,
-                                         Time endTime) throws SQLException {
+            Integer patientId,
+            Integer doctorId,
+            Date appointmentDate,
+            Time startTime,
+            Time endTime) throws SQLException {
         if (conn == null) {
             throw new SQLException("Connection is required");
         }

@@ -31,8 +31,9 @@ Complete management system for medical clinics, developed with **Spring Boot** a
 
 ### 🎯 Technical Highlights
 
-- ✅ **RESTful Architecture** with standardized response patterns
-- ✅ **Complete English Codebase** - all classes, methods, and endpoints in English
+- ✅ **RESTful Architecture** with standardized response patterns (ApiResponse pattern)
+- ✅ **Complete English API** - all endpoints and domain models in English
+- ✅ **Centralized Exception Handling** with semantic exceptions (Conflict, BusinessRule, DuplicateResource)
 - ✅ **Native Stored Procedures & Functions** in SQL Server
 - ✅ **Audit Triggers** for tracking medical record changes
 - ✅ **Automated Deployment** via GitHub Actions to Azure App Service
@@ -492,7 +493,64 @@ DELETE /api/medical-records/{id}
 
 ---
 
-## 🗄️ Data Model
+## � Exception Handling & Validation
+
+The API uses centralized exception handling with semantic, domain-specific exceptions:
+
+### Custom Exceptions
+
+#### DuplicateResourceException (409 Conflict)
+Thrown when attempting to create a resource that already exists:
+- Medical license already registered for another doctor
+- Patient CPF already in database
+- Medical record already exists for an appointment
+
+#### AppointmentConflictException (409 Conflict)
+Thrown when scheduling/updating appointments with conflicts:
+- Doctor has overlapping appointment at the scheduled time
+- Database integrity violation during appointment creation
+
+#### BusinessRuleException (400 Bad Request)
+Thrown when business validations fail:
+- Patient has associated appointments (cannot delete)
+- Appointment already cancelled (cannot cancel again)
+- Invalid status values for appointments
+- Null/required fields missing
+
+#### EntityNotFoundException (404 Not Found)
+Thrown when a requested resource is not found (JPA standard):
+- Patient not found
+- Doctor not found
+- Appointment not found
+- Specialty not found
+- Medical record not found
+
+### Response Format
+
+All error responses follow the standard `ApiResponse` format:
+
+```json
+{
+  "status": "error",
+  "message": "Resource not found",
+  "data": null
+}
+```
+
+### HTTP Status Codes
+
+| Status | Meaning | Common Causes |
+|--------|---------|---------------|
+| 200 OK | Success | Normal CRUD operations |
+| 201 Created | Resource created | POST successful |
+| 400 Bad Request | Validation error | Invalid input, business rule violation |
+| 404 Not Found | Resource missing | ID not found in database |
+| 409 Conflict | Duplicate or conflict | Duplicate resource, schedule conflict |
+| 500 Internal Server Error | Unexpected error | Unhandled exception |
+
+---
+
+## �🗄️ Data Model
 
 ### Main Tables
 
@@ -663,32 +721,60 @@ campus-clinic-api/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/example/clinic/
-│   │   │   ├── controllers/          # REST endpoints
-│   │   │   │   ├── EspecialidadeController.java
-│   │   │   │   ├── MedicoController.java
-│   │   │   │   ├── PacienteController.java
-│   │   │   │   ├── ConsultaController.java
-│   │   │   │   └── ProntuarioController.java
-│   │   │   ├── models/               # JPA entities
-│   │   │   │   ├── Especialidade.java
-│   │   │   │   ├── Medico.java
-│   │   │   │   ├── Paciente.java
-│   │   │   │   ├── Consulta.java
-│   │   │   │   ├── Prontuario.java
-│   │   │   │   ├── ConsultaStatus.java
-│   │   │   │   └── Sexo.java
-│   │   │   ├── repositories/         # Data access layer
-│   │   │   ├── services/             # Business logic
+│   │   │   ├── controllers/          # REST endpoints (@RestController)
+│   │   │   │   ├── SpecialtyController.java       # GET/POST/PUT/DELETE specialties
+│   │   │   │   ├── DoctorController.java          # Doctor management
+│   │   │   │   ├── PatientController.java         # Patient management
+│   │   │   │   ├── AppointmentController.java     # Appointment scheduling
+│   │   │   │   └── MedicalRecordController.java   # Medical records
+│   │   │   ├── models/               # JPA entities (@Entity)
+│   │   │   │   ├── Specialty.java
+│   │   │   │   ├── Doctor.java
+│   │   │   │   ├── Patient.java
+│   │   │   │   ├── Appointment.java
+│   │   │   │   ├── MedicalRecord.java
+│   │   │   │   ├── AppointmentStatus.java         # Enum
+│   │   │   │   ├── Gender.java                    # Enum
+│   │   │   │   └── GenderConverter.java           # JPA converter
+│   │   │   ├── repositories/         # Data access layer (JpaRepository)
+│   │   │   │   ├── SpecialtyRepository.java
+│   │   │   │   ├── DoctorRepository.java
+│   │   │   │   ├── PatientRepository.java
+│   │   │   │   ├── AppointmentRepository.java
+│   │   │   │   ├── MedicalRecordRepository.java
+│   │   │   │   └── AppointmentDetailProjection.java
+│   │   │   ├── services/             # Business logic (@Service)
+│   │   │   │   ├── SpecialtyService.java
+│   │   │   │   ├── DoctorService.java
+│   │   │   │   ├── PatientService.java
+│   │   │   │   ├── AppointmentService.java
+│   │   │   │   └── MedicalRecordService.java
 │   │   │   ├── dto/                  # Data transfer objects
-│   │   │   ├── exceptions/           # Exception handlers
-│   │   │   ├── SecurityConfig.java   # Security configuration
-│   │   │   └── WebConfig.java        # CORS configuration
+│   │   │   │   ├── ApiResponse.java              # Standard response wrapper
+│   │   │   │   ├── AppointmentDTO.java
+│   │   │   │   ├── AgendarConsultaDTO.java
+│   │   │   │   ├── AtualizarConsultaDTO.java
+│   │   │   │   └── ... (other DTOs)
+│   │   │   ├── exceptions/           # Exception handlers (@ControllerAdvice)
+│   │   │   │   ├── RestExceptionHandler.java     # Centralized error handling
+│   │   │   │   ├── DuplicateResourceException.java
+│   │   │   │   ├── AppointmentConflictException.java
+│   │   │   │   └── BusinessRuleException.java
+│   │   │   ├── h2/                   # H2 database support (testing)
+│   │   │   ├── SecurityConfig.java   # Spring Security configuration
+│   │   │   ├── WebConfig.java        # CORS configuration
+│   │   │   └── ClinicApplication.java # Main Spring Boot class
 │   │   └── resources/
-│   │       └── application.properties
+│   │       └── application.properties # Database & JPA config
 │   └── test/                         # Unit tests
-├── campus_clinic_schema.sql          # Database schema
-├── sample_data_english.sql           # Sample data
-├── pom.xml                           # Maven dependencies
+├── .github/workflows/
+│   └── clinic-api-deploy.yml         # GitHub Actions CI/CD
+├── Dockerfile                        # Multi-stage Docker build
+├── docker-compose.yml                # Docker Compose for local development
+├── campus_clinic_schema.sql          # SQL Server database schema
+├── sample_data_english.sql           # Sample test data
+├── test-docker.ps1                   # PowerShell test automation script
+├── pom.xml                           # Maven dependencies & build config
 └── README.md                         # This file
 ```
 
