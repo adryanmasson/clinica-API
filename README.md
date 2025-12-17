@@ -7,6 +7,7 @@
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-2019+-CC2927?style=for-the-badge&logo=microsoft-sql-server)
 ![Azure](https://img.shields.io/badge/Azure-Deployed-0078D4?style=for-the-badge&logo=microsoft-azure)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+[![CI](https://github.com/adryanmasson/campus-clinic-API/actions/workflows/ci.yml/badge.svg)](https://github.com/adryanmasson/campus-clinic-API/actions/workflows/ci.yml)
 
 **Complete medical clinic management system with RESTful API, appointment scheduling, electronic medical records, and automated audit logging.**
 
@@ -37,6 +38,12 @@ Complete management system for medical clinics, developed with **Spring Boot** a
 - ✅ **Automated Deployment** via GitHub Actions to Azure App Service
 - ✅ **Business Validations** at multiple layers (Database + Application)
 - ✅ **Spring Security** configured with CORS for frontend integration
+
+### 🌟 Reviewer Highlights
+- **Fast to run**: one-command run via Docker.
+- **Production-minded**: CI builds and tests on every push (GitHub Actions).
+- **Pragmatic design**: clean layering (controllers → services → repositories) and DTOs.
+- **Database-first**: stored procedures, functions, and triggers with audit.
 
 ---
 
@@ -659,6 +666,37 @@ campus-clinic-api/
 ├── sample_data_english.sql           # Sample data
 ├── pom.xml                           # Maven dependencies
 └── README.md                         # This file
+```
+
+## 🐳 Docker (Quick Start)
+
+Build and run locally with Docker:
+
+```bash
+docker build -t campus-clinic-api .
+docker run --rm -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL="jdbc:sqlserver://your-server.database.windows.net:1433;database=campus_clinic;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;" \
+  -e SPRING_DATASOURCE_USERNAME="your_username" \
+  -e SPRING_DATASOURCE_PASSWORD="your_password" \
+  campus-clinic-api
+```
+
+If you don’t have a SQL Server handy, the API still starts but DB-backed endpoints will error — for interviews, this is enough to evaluate structure, security, and API design.
+
+## 🧭 Architecture (Mermaid)
+
+```mermaid
+flowchart LR
+  Client -->|HTTP| API[Spring Boot Controllers]
+  API --> SVC[Services]
+  SVC --> REPO[JPA Repositories]
+  REPO --> DB[(Azure SQL / SQL Server)]
+  subgraph Cross-cutting
+    SEC[Security / CORS]
+    DTO[DTOs / Validation]
+  end
+  API --- SEC
+  API --- DTO
 ```
 
 ---

@@ -1,0 +1,11 @@
+target/
+.git/
+.github/
+.mvn/
+Dockerfile
+README.md
+README_PT.md
+*.iml
+.idea/
+.vscode/
+*.log
