@@ -11,7 +11,7 @@
 
 **Complete medical clinic management system with RESTful API, appointment scheduling, electronic medical records, and automated audit logging.**
 
-[🌐 Live Demo](https://clinica-api-adryan.azurewebsites.net/api/specialties) | [📖 Documentation](#-api-endpoints) | [🚀 Deploy](#-azure-deployment)
+[🌐 Live Demo](https://clinic-api-app-b0g9f5faczgjcde8.brazilsouth-01.azurewebsites.net/api/specialties) | [📖 Documentation](#-api-endpoints) | [🚀 Deploy](#-azure-deployment)
 
 > ⚠️ **Note:** Demo hosted on Azure App Service Free (F1) plan - may take 30-60 seconds to wake up on first request or be temporarily offline due to 60 min/day CPU quota. For local testing, see [Running Locally](#-running-locally).
 
@@ -115,7 +115,7 @@ Complete management system for medical clinics, developed with **Spring Boot** a
 
 ### Base URL
 ```
-https://clinica-api-adryan.azurewebsites.net
+https://clinic-api-app-b0g9f5faczgjcde8.brazilsouth-01.azurewebsites.net
 ```
 
 All endpoints are prefixed with `/api` automatically via `spring.mvc.servlet.path=/api` configured in application.properties.
