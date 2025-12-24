@@ -1,3 +1,24 @@
+# Maven build outputs
+/target/
+
+# IDE configs
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+.vscode/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local dev logs and archives
+devlogs*/
+devlogs*.zip
+
+# Node artifacts if any frontend sneaks in
+node_modules/
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
