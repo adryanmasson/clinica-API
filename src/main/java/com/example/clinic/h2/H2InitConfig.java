@@ -28,18 +28,26 @@ public class H2InitConfig {
     @Bean
     CommandLineRunner registerH2Aliases() {
         return args -> {
-            try (Connection conn = dataSource.getConnection(); Statement stmt = conn.createStatement()) {
-                stmt.execute("CREATE SCHEMA IF NOT EXISTS dbo");
-                stmt.execute(
-                        "CREATE ALIAS IF NOT EXISTS CALCULATE_AGE FOR \"com.example.clinic.h2.H2Functions.calculateAge\"");
-                stmt.execute(
-                        "CREATE ALIAS IF NOT EXISTS DBO.CALCULATE_AGE FOR \"com.example.clinic.h2.H2Functions.calculateAge\"");
-                stmt.execute(
-                        "CREATE ALIAS IF NOT EXISTS CREATEAPPOINTMENT FOR \"com.example.clinic.h2.H2Functions.createAppointment\"");
-                stmt.execute(
-                        "CREATE ALIAS IF NOT EXISTS createAppointment FOR \"com.example.clinic.h2.H2Functions.createAppointment\"");
-                stmt.execute(
-                        "CREATE ALIAS IF NOT EXISTS create_appointment FOR \"com.example.clinic.h2.H2Functions.createAppointment\"");
+            try (Connection conn = dataSource.getConnection()) {
+                // Somente registra aliases quando a conexão for H2.
+                String url = conn.getMetaData() != null ? conn.getMetaData().getURL() : null;
+                if (url == null || !url.startsWith("jdbc:h2")) {
+                    return;
+                }
+
+                try (Statement stmt = conn.createStatement()) {
+                    stmt.execute("CREATE SCHEMA IF NOT EXISTS dbo");
+                    stmt.execute(
+                            "CREATE ALIAS IF NOT EXISTS CALCULATE_AGE FOR \"com.example.clinic.h2.H2Functions.calculateAge\"");
+                    stmt.execute(
+                            "CREATE ALIAS IF NOT EXISTS DBO.CALCULATE_AGE FOR \"com.example.clinic.h2.H2Functions.calculateAge\"");
+                    stmt.execute(
+                            "CREATE ALIAS IF NOT EXISTS CREATEAPPOINTMENT FOR \"com.example.clinic.h2.H2Functions.createAppointment\"");
+                    stmt.execute(
+                            "CREATE ALIAS IF NOT EXISTS createAppointment FOR \"com.example.clinic.h2.H2Functions.createAppointment\"");
+                    stmt.execute(
+                            "CREATE ALIAS IF NOT EXISTS create_appointment FOR \"com.example.clinic.h2.H2Functions.createAppointment\"");
+                }
             }
         };
     }
