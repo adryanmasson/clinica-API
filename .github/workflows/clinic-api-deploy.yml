@@ -66,3 +66,9 @@ jobs:
 
       - name: Output deployment URL
         run: echo "Deployed to https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+
+      - name: Wait 3 minutes then stop Web App (sleep automation)
+        shell: pwsh
+        run: |
+          Start-Sleep -Seconds 180
+          az webapp stop --resource-group $env:AZURE_RESOURCE_GROUP --name $env:AZURE_WEBAPP_NAME
